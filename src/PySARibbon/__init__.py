@@ -6,6 +6,7 @@
 
 from .SAFramelessHelper import SAFramelessHelper
 from .SARibbonBar import SARibbonBar
+from .SARibbonBarLayout import SARibbonBarLayout
 from .SARibbonButtonGroupWidget import SARibbonButtonGroupWidget
 from .SARibbonCategory import SARibbonCategory
 from .SARibbonCategoryLayout import SARibbonCategoryLayout
