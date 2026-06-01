@@ -631,6 +631,30 @@ class SARibbonBar(QMenuBar):
         """判断是否为三行模式"""
         return not self.isTwoRowStyle() and not self.isSingleRowStyle()
 
+    def setEnableWordWrap(self, enable: bool):
+        """设置所有按钮是否允许文字换行，级联到所有 Category/Panel/Button"""
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                p.setEnableWordWrap(enable)
+
+    def isEnableWordWrap(self) -> bool:
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                return p.isEnableWordWrap()
+        return False
+
+    def setEnableIconRightText(self, enable: bool):
+        """设置所有按钮强制图标左文字右，级联到所有 Category/Panel/Button"""
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                p.setEnableIconRightText(enable)
+
+    def isEnableIconRightText(self) -> bool:
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                return p.isEnableIconRightText()
+        return False
+
     def setRibbonStyle(self, style):
         """设置ribbonbar的风格，此函数会重新设置所有元素"""
         self.m_d.ribbonStyle = style

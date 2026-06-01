@@ -255,6 +255,24 @@ class SARibbonPannel(QWidget):
     def isEnableShowTitle(self) -> bool:
         return self._enableShowTitle
 
+    def setEnableWordWrap(self, enable: bool):
+        """设置 Panel 下所有按钮是否允许文字换行"""
+        for btn in self.ribbonToolButtons():
+            btn.setEnableWordWrap(enable)
+
+    def isEnableWordWrap(self) -> bool:
+        btns = self.ribbonToolButtons()
+        return btns[0].isEnableWordWrap() if btns else False
+
+    def setEnableIconRightText(self, enable: bool):
+        """设置 Panel 下所有按钮强制图标左文字右"""
+        for btn in self.ribbonToolButtons():
+            btn.setEnableIconRightText(enable)
+
+    def isEnableIconRightText(self) -> bool:
+        btns = self.ribbonToolButtons()
+        return btns[0].isEnableIconRightText() if btns else False
+
     def actionIndex(self, act: QAction):
         """action对应的布局index，此操作一般用于移动，其他意义不大"""
         return self.m_layout.indexOf(act)

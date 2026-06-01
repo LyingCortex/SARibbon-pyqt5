@@ -35,6 +35,7 @@ class SARibbonToolButton(QToolButton):
         self.m_menuButtonPressed = False
         self.m_iconRect = QRect()
         self.m_isWordWrap = False            # 标记是否文字换行 @default false
+        self._enableIconRightText = False    # 强制图标左文字右
 
         if act:
             self.setDefaultAction(act)
@@ -65,6 +66,32 @@ class SARibbonToolButton(QToolButton):
 
     def largeButtonType(self) -> int:
         return self.m_largeButtonType
+
+    def setEnableWordWrap(self, enable: bool):
+        """设置是否允许文字换行"""
+        self.m_isWordWrap = enable
+        self.updateGeometry()
+        self.update()
+
+    def isEnableWordWrap(self) -> bool:
+        return self.m_isWordWrap
+
+    def setEnableIconRightText(self, enable: bool):
+        """设置是否强制图标左文字右（SmallButton 水平布局）"""
+        if self._enableIconRightText == enable:
+            return
+        self._enableIconRightText = enable
+        if enable:
+            self.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+            self.setIconSize(QSize(18, 18))
+        else:
+            # 恢复按钮类型默认样式
+            self.setButtonType(self.m_buttonType)
+        self.updateGeometry()
+        self.update()
+
+    def isEnableIconRightText(self) -> bool:
+        return self._enableIconRightText
 
     def liteLargeButtonIconHeight(self, buttonHeight: int) -> int:
         return int(buttonHeight * LITE_LARGE_BUTTON_ICON_HIGHT_RATE)
