@@ -235,6 +235,10 @@ if PYQT_VERSION == 6:
     # QRubberBand
     QRubberBand.Rectangle = QRubberBand.Shape.Rectangle
 
+    # QStyleOptionToolButton
+    QStyleOptionToolButton.Menu = QStyleOptionToolButton.ToolButtonFeature.Menu
+    QStyleOptionToolButton.HasMenu = QStyleOptionToolButton.ToolButtonFeature.HasMenu
+
     # QIODevice
     QIODevice.ReadOnly = QIODevice.OpenModeFlag.ReadOnly
     QIODevice.WriteOnly = QIODevice.OpenModeFlag.WriteOnly

@@ -16,5 +16,6 @@ from .SARibbonMainWindow import SARibbonMainWindow
 from .SARibbonPannel import SARibbonPannel
 from .SARibbonPannelLayout import SARibbonPannelLayout
 from .SARibbonQuickAccessBar import SARibbonQuickAccessBar
+from .SARibbonSystemButtonBar import SARibbonSystemButtonBar
 from .SARibbonWidget import SARibbonWidget
 from .SAWindowButtonGroup import SAWindowButtonGroup
