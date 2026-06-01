@@ -61,9 +61,12 @@ class SARibbonPannel(QWidget):
         self.m_layout = layout
 
     def rowCount(self) -> int:
-        # SARibbonPannel.TwoRowMode 或 SARibbonPannel.ThreeRowMode
-        count = 2 if self.pannelLayoutMode() == SARibbonPannel.TwoRowMode else 3
-        return count
+        mode = self.pannelLayoutMode()
+        if mode == SARibbonPannel.SingleRowMode:
+            return 1
+        elif mode == SARibbonPannel.TwoRowMode:
+            return 2
+        return 3
 
     def pannelLayoutMode(self) -> int:
         return self.m_pannelLayoutMode
@@ -234,8 +237,9 @@ class SARibbonPannel(QWidget):
 
     def titleHeight(self) -> int:
         """标题栏高度，仅在三行模式下生效"""
-        h = 0 if self.isTwoRow() else 21
-        return h
+        if self.pannelLayoutMode() == SARibbonPannel.ThreeRowMode:
+            return 21
+        return 0
 
     def actionIndex(self, act: QAction):
         """action对应的布局index，此操作一般用于移动，其他意义不大"""
@@ -280,6 +284,12 @@ class SARibbonPannel(QWidget):
     def resetLargeToolButtonStyle(self):
         """重置大按钮的类型"""
         btns = self.ribbonToolButtons()
+        if SARibbonPannel.SingleRowMode == self.pannelLayoutMode():
+            # SingleRow模式下所有按钮都使用SmallButton水平布局
+            for b in btns:
+                if b and b.buttonType() != SARibbonToolButton.SmallButton:
+                    b.setButtonType(SARibbonToolButton.SmallButton)
+            return
         for b in btns:
             if not b or SARibbonToolButton.LargeButton != b.buttonType():
                 continue
@@ -365,6 +375,7 @@ class SARibbonPannel(QWidget):
     # PannelLayoutMode
     ThreeRowMode = SARibbonPannelLayout.ThreeRowMode
     TwoRowMode = SARibbonPannelLayout.TwoRowMode
+    SingleRowMode = SARibbonPannelLayout.SingleRowMode
 
 
 if __name__ == '__main__':

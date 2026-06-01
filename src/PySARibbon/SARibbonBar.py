@@ -184,12 +184,17 @@ class SARibbonBar(QMenuBar):
         QApplication.postEvent(self, QResizeEvent(self.size(), self.size()))
 
     @staticmethod
-    def checkTwoRowStyle(style) -> bool:    # C++为isTwoRowStyle
+    def checkTwoRowStyle(style) -> bool:
         """判断RibbonStyle是否为2行模式"""
-        return style & 0xFF00 > 0
+        return (style & 0xFF00) == 0x0100
 
     @staticmethod
-    def checkOfficeStyle(style) -> bool:    # C++为isOfficeStyle
+    def checkSingleRowStyle(style) -> bool:
+        """判断RibbonStyle是否为单行模式"""
+        return (style & 0xFF00) == 0x0200
+
+    @staticmethod
+    def checkOfficeStyle(style) -> bool:
         """判断是否是office样式"""
         return style & 0xFF == 0
 
@@ -234,7 +239,7 @@ class SARibbonBar(QMenuBar):
         else:
             category: SARibbonCategory = __args[0]
             category.setRibbonBar(self)
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
+            mode = self._pannelLayoutMode()
             category.setRibbonPannelLayoutMode(mode)
             index = self.m_d.ribbonTabBar.addTab(category.windowTitle())
 
@@ -265,7 +270,7 @@ class SARibbonBar(QMenuBar):
             category: SARibbonCategory = __args[0]
             index = __args[1]
             i = self.m_d.ribbonTabBar.insertTab(index, category.windowTitle())
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
+            mode = self._pannelLayoutMode()
             category.setRibbonPannelLayoutMode(mode)
 
             tabdata = _SARibbonTabData()
@@ -416,7 +421,7 @@ class SARibbonBar(QMenuBar):
         contextCategoryData.contextCategory = context
         for i in range(context.categoryCount()):
             category = context.categoryPage(i)
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
+            mode = self._pannelLayoutMode()
             category.setRibbonPannelLayoutMode(mode)
             index = self.m_d.ribbonTabBar.addTab(category.windowTitle())
             contextCategoryData.tabPageIndex.append(index)
@@ -578,6 +583,18 @@ class SARibbonBar(QMenuBar):
         """判断当前的样式是否为两行"""
         return SARibbonBar.checkTwoRowStyle(self.currentRibbonStyle())
 
+    def isSingleRowStyle(self) -> bool:
+        """判断当前的样式是否为单行"""
+        return SARibbonBar.checkSingleRowStyle(self.currentRibbonStyle())
+
+    def _pannelLayoutMode(self) -> int:
+        """根据当前样式返回对应的PannelLayoutMode"""
+        if self.isSingleRowStyle():
+            return SARibbonPannel.SingleRowMode
+        elif self.isTwoRowStyle():
+            return SARibbonPannel.TwoRowMode
+        return SARibbonPannel.ThreeRowMode
+
     def isOfficeStyle(self) -> bool:
         """判断当前的样式是否为office样式"""
         return SARibbonBar.checkOfficeStyle(self.currentRibbonStyle())
@@ -635,6 +652,8 @@ class SARibbonBar(QMenuBar):
             SARibbonBar.WpsLiteStyle: RibbonSubElementStyleOpt.mainbarHeightWPSStyleThreeRow,
             SARibbonBar.OfficeStyleTwoRow: RibbonSubElementStyleOpt.mainbarHeightOfficeStyleTwoRow,
             SARibbonBar.WpsLiteStyleTwoRow: RibbonSubElementStyleOpt.mainbarHeightWPSStyleTwoRow,
+            SARibbonBar.OfficeStyleSingleRow: RibbonSubElementStyleOpt.mainbarHeightOfficeStyleSingleRow,
+            SARibbonBar.WpsLiteStyleSingleRow: RibbonSubElementStyleOpt.mainbarHeightWPSStyleSingleRow,
         }
         return styleDict.get(currentStyle, RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow)
 
@@ -658,8 +677,13 @@ class SARibbonBar(QMenuBar):
     def updateRibbonElementGeometry(self):
         """根据样式调整SARibbonCategory的布局形式"""
         categorys = self.categoryPages()
+        if self.isSingleRowStyle():
+            mode = SARibbonPannel.SingleRowMode
+        elif self.isTwoRowStyle():
+            mode = SARibbonPannel.TwoRowMode
+        else:
+            mode = SARibbonPannel.ThreeRowMode
         for c in categorys:
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
             c.setRibbonPannelLayoutMode(mode)
         if SARibbonBar.NormalRibbonMode == self.currentRibbonState():
             self.setFixedHeight(self.mainBarHeight())
@@ -1065,9 +1089,11 @@ class SARibbonBar(QMenuBar):
 
     # 枚举
     OfficeStyle = 0x0000            # 类似office 的ribbon风格
-    OfficeStyleTwoRow = 0x0100      # 类似office 的ribbon风格 2行工具栏 三行布局模式，默认模式
+    OfficeStyleTwoRow = 0x0100      # 类似office 的ribbon风格 2行工具栏
+    OfficeStyleSingleRow = 0x0200   # 类似office 的ribbon风格 单行工具栏
     WpsLiteStyle = 0x0001           # 类似wps的紧凑风格
     WpsLiteStyleTwoRow = 0x0101     # 类似wps的紧凑风格  2行工具栏
+    WpsLiteStyleSingleRow = 0x0201  # 类似wps的紧凑风格  单行工具栏
     MinimumRibbonMode = 0x0000
     NormalRibbonMode = 0x0001
 

@@ -279,7 +279,17 @@ class SARibbonPannelLayout(QLayout):
             if SARibbonPannelItem.RPNone == rp:
                 rp = SARibbonPannelItem.RPLarge if (exp & Qt.Vertical) else SARibbonPannelItem.RPSmall
             hint = item.sizeHint()
-            if SARibbonPannelItem.RPLarge == rp:
+
+            # SingleRowMode: 所有item在同一行横向排列
+            if 1 == rowCount:
+                item.rowIndex = 0
+                item.columnIndex = column
+                item.itemWillSetGeometry = QRect(int(x), int(magin.top()), int(hint.width()), int(smallH))
+                x += hint.width() + spacing
+                row = 0
+                column += 1
+                columMaxWidth = 0
+            elif SARibbonPannelItem.RPLarge == rp:
                 # 在Large模式，如果不是处于新列的第一行，就需要进行换列处理
                 if row != 0:
                     x += columMaxWidth + spacing
@@ -422,3 +432,4 @@ class SARibbonPannelLayout(QLayout):
     # PannelLayoutMode
     ThreeRowMode = 0
     TwoRowMode = 1
+    SingleRowMode = 2

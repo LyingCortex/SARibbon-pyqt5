@@ -25,6 +25,8 @@ class SARibbonStyleOption:
         self.mainbarHeightWPSStyleThreeRow: int = 130       # WpsLiteStyle 样式下的mainbar高度
         self.mainbarHeightOfficeStyleTwoRow: int = 134      # OfficeStyleTwoRow 样式下的mainbar高度
         self.mainbarHeightWPSStyleTwoRow: int = 104         # WpsLiteStyleTwoRow 样式下的mainbar高度
+        self.mainbarHeightOfficeStyleSingleRow: int = 100   # OfficeStyleSingleRow 样式下的mainbar高度
+        self.mainbarHeightWPSStyleSingleRow: int = 80       # WpsLiteStyleSingleRow 样式下的mainbar高度
         self.titleBarHeight: int = 30                       # 标题栏高度
         self.tabBarHeight: int = 25                         # ribbon tab 的高度
         self.titleTextColor: QColor = Qt.black              # 标题颜色
