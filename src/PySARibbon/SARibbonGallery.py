@@ -3,7 +3,7 @@
 @Module     SARibbonGallery
 @Author     ROOT
 """
-import PySARibbon.resource_rc
+from . import resource_rc
 from typing import List
 from .compat import QSize, pyqtSignal, Qt, QPoint, QModelIndex, QIcon, QResizeEvent, QFrame, QActionGroup, QAction, QWidget, QVBoxLayout, QSizePolicy, QApplication
 

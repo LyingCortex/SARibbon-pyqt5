@@ -30,7 +30,7 @@ class SARibbonStyleOption:
         self.titleBarHeight: int = 30                       # 标题栏高度
         self.tabBarHeight: int = 25                         # ribbon tab 的高度
         self.titleTextColor: QColor = Qt.black              # 标题颜色
-        self.widgetBord: QMargins = QMargins(5, 1, 5, 5)    # 整个ribbonbar的四个边框
+        self.widgetBorder: QMargins = QMargins(5, 1, 5, 5)    # 整个ribbonbar的四个边框
         self.tabBarBaseLineColor: QColor = QColor(186, 201, 219)     # tabbar 底部线条颜色
 
 

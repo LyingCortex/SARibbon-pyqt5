@@ -56,8 +56,8 @@ class SARibbonBarLayout(QLayout):
     def _layoutOfficeStyle(self, bar, rect: QRect):
         """Office风格布局：标题栏 + tabbar行 + 内容区"""
         d = bar.m_d
-        x = RibbonSubElementStyleOpt.widgetBord.left()
-        y = RibbonSubElementStyleOpt.widgetBord.top()
+        x = RibbonSubElementStyleOpt.widgetBorder.left()
+        y = RibbonSubElementStyleOpt.widgetBorder.top()
         titleH = bar.titleBarHeight()
         validTitleBarHeight = titleH - y
         tabH = bar.tabBarHeight()
@@ -77,13 +77,13 @@ class SARibbonBarLayout(QLayout):
             d.quickAccessBar.setGeometry(int(x), int(y), int(qs.width()), int(validTitleBarHeight))
 
         # 第二行：applicationButton → [tabBar] ← tabBarRightGroup ← cornerR
-        x = RibbonSubElementStyleOpt.widgetBord.left()
-        y = titleH + RibbonSubElementStyleOpt.widgetBord.top()
-        if d.applitionButton and d.applitionButton.isVisible():
-            d.applitionButton.setGeometry(int(x), int(y), int(bar.applitionButtonWidth()), int(tabH))
-            x = d.applitionButton.geometry().right()
+        x = RibbonSubElementStyleOpt.widgetBorder.left()
+        y = titleH + RibbonSubElementStyleOpt.widgetBorder.top()
+        if d.applicationButton and d.applicationButton.isVisible():
+            d.applicationButton.setGeometry(int(x), int(y), int(bar.applicationButtonWidth()), int(tabH))
+            x = d.applicationButton.geometry().right()
 
-        endX = rect.width() - RibbonSubElementStyleOpt.widgetBord.right()
+        endX = rect.width() - RibbonSubElementStyleOpt.widgetBorder.right()
         connerR = bar.cornerWidget(Qt.TopRightCorner)
         if connerR and connerR.isVisible():
             cs = connerR.sizeHint()
@@ -102,18 +102,18 @@ class SARibbonBarLayout(QLayout):
     def _layoutWpsLiteStyle(self, bar, rect: QRect):
         """WPS风格布局：applicationButton + tabBar + 标题 + quickAccessBar 在同一行"""
         d = bar.m_d
-        x = RibbonSubElementStyleOpt.widgetBord.left()
-        y = RibbonSubElementStyleOpt.widgetBord.top()
+        x = RibbonSubElementStyleOpt.widgetBorder.left()
+        y = RibbonSubElementStyleOpt.widgetBorder.top()
         titleH = bar.titleBarHeight()
         validTitleBarHeight = titleH - y
 
         # applicationButton
-        if d.applitionButton and d.applitionButton.isVisible():
-            d.applitionButton.setGeometry(int(x), int(y), int(bar.applitionButtonWidth()), int(titleH))
-            x = d.applitionButton.geometry().right() + 2
+        if d.applicationButton and d.applicationButton.isVisible():
+            d.applicationButton.setGeometry(int(x), int(y), int(bar.applicationButtonWidth()), int(titleH))
+            x = d.applicationButton.geometry().right() + 2
 
         # 从右边开始布局
-        endX = rect.width() - RibbonSubElementStyleOpt.widgetBord.right() - d.windowButtonSize.width()
+        endX = rect.width() - RibbonSubElementStyleOpt.widgetBorder.right() - d.windowButtonSize.width()
         connerR = bar.cornerWidget(Qt.TopRightCorner)
         if connerR and connerR.isVisible():
             cs = connerR.sizeHint()
@@ -151,18 +151,18 @@ class SARibbonBarLayout(QLayout):
         d = bar.m_d
         if d.stackedContainerWidget.isPopupMode():
             absPos = bar.mapToGlobal(QPoint(
-                RibbonSubElementStyleOpt.widgetBord.left(),
+                RibbonSubElementStyleOpt.widgetBorder.left(),
                 d.ribbonTabBar.geometry().bottom() + 1
             ))
             d.stackedContainerWidget.setGeometry(
                 int(absPos.x()), int(absPos.y()),
-                int(bar.width() - RibbonSubElementStyleOpt.widgetBord.left() - RibbonSubElementStyleOpt.widgetBord.right()),
-                int(bar.mainBarHeight() - d.ribbonTabBar.geometry().bottom() - RibbonSubElementStyleOpt.widgetBord.bottom() - 1)
+                int(bar.width() - RibbonSubElementStyleOpt.widgetBorder.left() - RibbonSubElementStyleOpt.widgetBorder.right()),
+                int(bar.mainBarHeight() - d.ribbonTabBar.geometry().bottom() - RibbonSubElementStyleOpt.widgetBorder.bottom() - 1)
             )
         else:
             d.stackedContainerWidget.setGeometry(
-                int(RibbonSubElementStyleOpt.widgetBord.left()),
+                int(RibbonSubElementStyleOpt.widgetBorder.left()),
                 int(d.ribbonTabBar.geometry().bottom() + 1),
-                int(bar.width() - RibbonSubElementStyleOpt.widgetBord.left() - RibbonSubElementStyleOpt.widgetBord.right()),
-                int(bar.mainBarHeight() - d.ribbonTabBar.geometry().bottom() - RibbonSubElementStyleOpt.widgetBord.bottom() - 1)
+                int(bar.width() - RibbonSubElementStyleOpt.widgetBorder.left() - RibbonSubElementStyleOpt.widgetBorder.right()),
+                int(bar.mainBarHeight() - d.ribbonTabBar.geometry().bottom() - RibbonSubElementStyleOpt.widgetBorder.bottom() - 1)
             )
