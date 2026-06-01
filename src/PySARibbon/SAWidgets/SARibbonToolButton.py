@@ -3,9 +3,7 @@
 @Module     SARibbonToolButton
 @Author     ROOT
 """
-from PyQt5.QtCore import Qt, QSize, QRect, QEvent, QPoint
-from PyQt5.QtGui import QPixmap, QPainter, QIcon, QCursor, QPalette
-from PyQt5.QtWidgets import QToolButton, QAction, QStyleOptionToolButton, QWidget, QStyle, QSizePolicy, QStylePainter, QStyleOption
+from ..compat import Qt, QSize, QRect, QEvent, QPoint, QPixmap, QPainter, QIcon, QCursor, QPalette, QToolButton, QAction, QStyleOptionToolButton, QWidget, QStyle, QSizePolicy, QStylePainter, QStyleOption
 
 LITE_LARGE_BUTTON_ICON_HIGHT_RATE = 0.52
 ARROW_WIDTH = 10
@@ -87,7 +85,7 @@ class SARibbonToolButton(QToolButton):
                 if (opt.features & QStyleOptionToolButton.Menu) or (opt.features & QStyleOptionToolButton.HasMenu):
                     self.m_iconRect.adjust(0, 0, -ARROW_WIDTH, 0)
             else:
-                self.m_iconRect = QRect(0, 0, max(opt.rect.height(), opt.iconSize.width()), opt.rect.height())
+                self.m_iconRect = QRect(0, 0, int(max(opt.rect.height(), opt.iconSize.width())), int(opt.rect.height()))
 
     def calcTextRect(self, *_args) -> QRect:
         """根据设定计算文本显示区域
@@ -391,7 +389,7 @@ class SARibbonToolButton(QToolButton):
             if s.width() > s.height() * 1.4:
                 alignment = Qt.TextShowMnemonic | Qt.TextWordWrap
                 fm = self.fontMetrics()
-                textRange = self.calcTextRect(QRect(0, 0, int(s.width() / 2), s.height()))
+                textRange = self.calcTextRect(QRect(0, 0, int(s.width() / 2), int(s.height())))
                 textRange.moveTo(0, 0)
                 textRange = fm.boundingRect(textRange, alignment, self.text())
                 s.setWidth(textRange.width()+4)
@@ -499,7 +497,7 @@ class SARibbonToolButton(QToolButton):
 
 
 if __name__ == '__main__':
-    from PyQt5.QtWidgets import QApplication
+    from ..compat import QApplication
     from SAWidgets.SARibbonMenu import SARibbonMenu
 
     app = QApplication([])

@@ -5,7 +5,7 @@
 
 @brief ribbon左上顶部的快速响应栏（WPS风格在右上角）
 """
-from PyQt5.QtWidgets import QAction, QWidget, QToolButton, QMenu, QStyleOption
+from .compat import QAction, QWidget, QToolButton, QMenu, QStyleOption
 
 from .SARibbonButtonGroupWidget import SARibbonButtonGroupWidget
 from .SAWidgets.SARibbonCtrlContainer import SARibbonCtrlContainer

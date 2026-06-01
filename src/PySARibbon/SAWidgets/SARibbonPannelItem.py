@@ -10,8 +10,7 @@
 
  无窗口的action会在内部生成一个SARibbonToolButton
 """
-from PyQt5.QtCore import QRect
-from PyQt5.QtWidgets import QWidgetItem, QAction
+from ..compat import QRect, QWidgetItem, QAction
 
 
 class SARibbonPannelItem(QWidgetItem):

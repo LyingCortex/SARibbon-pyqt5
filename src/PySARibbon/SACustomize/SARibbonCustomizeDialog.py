@@ -11,8 +11,7 @@ SARibbonActionsManager可以快速绑定所有QAction，详细见SARibbonActions
 那么在对话框生成前为了保证同步需要调用@ref SARibbonCustomizeDialog::fromXml 同步配置文件，这样再次修改后的配置文件就一致
 """
 
-from PyQt5.QtCore import Qt, QXmlStreamWriter, QXmlStreamReader
-from PyQt5.QtWidgets import QDialog, QWidget, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy, QPushButton, \
+from ..compat import Qt, QXmlStreamWriter, QXmlStreamReader, QDialog, QWidget, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy, QPushButton, \
     QApplication
 
 from .SARibbonCustomizeWidget import SARibbonCustomizeWidget

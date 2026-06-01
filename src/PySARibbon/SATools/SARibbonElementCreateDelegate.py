@@ -3,8 +3,7 @@
 @Module     SARibbonElementCreateDelegate
 @Author     ROOT
 """
-from PyQt5.QtCore import Qt, QMargins
-from PyQt5.QtGui import QColor
+from ..compat import Qt, QMargins, QColor
 
 from ..SAWidgets.SARibbonTabBar import SARibbonTabBar
 from ..SAWidgets.SARibbonApplicationButton import SARibbonApplicationButton

@@ -8,7 +8,7 @@
 PrefixLabel|_Widget_|SuffixLabel
 """
 
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout
+from ..compat import QWidget, QLabel, QHBoxLayout
 
 
 class SARibbonLineWidgetContainer(QWidget):
