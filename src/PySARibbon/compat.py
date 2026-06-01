@@ -178,6 +178,7 @@ if PYQT_VERSION == 6:
     QEvent.ActionRemoved = QEvent.Type.ActionRemoved
     QEvent.UpdateLater = QEvent.Type.UpdateLater
     QEvent.WindowActivate = QEvent.Type.WindowActivate
+    QEvent.WindowDeactivate = QEvent.Type.WindowDeactivate
 
     # QFrame shortcuts
     QFrame.NoFrame = QFrame.Shape.NoFrame
