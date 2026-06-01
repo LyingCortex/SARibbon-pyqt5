@@ -2,10 +2,11 @@
 """
 @Module     SARibbonCategoryLayout
 @Author     ROOT
+
+@brief SARibbonCategory的布局管理器，负责管理pannel的水平排列和滚动
 """
-from typing import List
-from PyQt5.QtCore import QRect, QSize, QMargins, Qt
-from PyQt5.QtWidgets import QLayout, QWidgetItem, QLayoutItem, QWidget
+from typing import List, Union
+from .compat import QRect, QSize, QMargins, Qt, QLayout, QLayoutItem, QWidget, QWidgetItem
 
 from .SAWidgets.SARibbonCategoryScrollButton import SARibbonCategoryScrollButton
 from .SAWidgets.SARibbonSeparatorWidget import SARibbonSeparatorWidget
@@ -13,263 +14,270 @@ from .SATools.SARibbonElementManager import RibbonSubElementDelegate
 
 
 class SARibbonCategoryLayoutItem(QWidgetItem):
-    def __init__(self, parent):
-        super().__init__(parent)
+    """布局项，包含pannel和对应的分割线"""
+    def __init__(self, pannel: QWidget):
+        super().__init__(pannel)
         self.separatorWidget: SARibbonSeparatorWidget = None
-        self.mWillSetGeometry = QRect()             # pannel将要设置的Geometry
-        self.mWillSetSeparatorGeometry = QRect()    # pannel将要设置的Separator的Geometry
-
-
-class SARibbonCategoryLayoutPrivate:
-    def __init__(self, parent):
-        self.q_d = parent
-        self.mDirty = True
-        self.mSizeHint = QSize(50, 50)
-        self.mTotalWidth = 0
-        self.mXBase = 0
-        self.mLeftScrollBtn: SARibbonCategoryScrollButton = None
-        self.mRightScrollBtn: SARibbonCategoryScrollButton = None
-        self.mIsLeftScrollBtnShow = False
-        self.mIsRightScrollBtnShow = False
-        self.mItemList: List[SARibbonCategoryLayoutItem] = list()
-
-    def totalSizeHintWidth(self) -> int:
-        """计算所有元素的SizeHint宽度总和"""
-        mag: QMargins = self.q_d.contentsMargins()
-        total = 0
-        if not mag.isNull():
-            total += mag.left() + mag.right()
-        for item in self.mItemList:
-            if item.isEmpty():
-                continue
-            pannelSize = item.widget().sizeHint()
-            separatorSize = QSize(0, 0)
-            if item.separatorWidget:
-                separatorSize = item.separatorWidget.sizeHint()
-            total += pannelSize.width()
-            total += separatorSize.width()
-        return total
+        self.mWillSetGeometry = QRect()
+        self.mWillSetSeparatorGeometry = QRect()
 
 
 class SARibbonCategoryLayout(QLayout):
-    def __init__(self, parent):
+    def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.m_d = SARibbonCategoryLayoutPrivate(self)
-        self.m_d.mLeftScrollBtn = SARibbonCategoryScrollButton(Qt.LeftArrow, parent)
-        self.m_d.mLeftScrollBtn.setVisible(False)
-        self.m_d.mLeftScrollBtn.clicked.connect(self.onLeftScrollButtonClicked)
-        self.m_d.mRightScrollBtn = SARibbonCategoryScrollButton(Qt.RightArrow, parent)
-        self.m_d.mRightScrollBtn.setVisible(False)
-        self.m_d.mLeftScrollBtn.clicked.connect(self.onRightScrollButtonClicked)
+        self._items: List[SARibbonCategoryLayoutItem] = []
+        self._totalWidth = 0
+        self._xBase = 0
+        self._isLeftScrollBtnShow = False
+        self._isRightScrollBtnShow = False
+        self._sizeHint = QSize(50, 50)
+        self._dirty = True
+
+        self._leftScrollBtn = SARibbonCategoryScrollButton(Qt.LeftArrow, parent)
+        self._leftScrollBtn.setVisible(False)
+        self._rightScrollBtn = SARibbonCategoryScrollButton(Qt.RightArrow, parent)
+        self._rightScrollBtn.setVisible(False)
+
         self.setContentsMargins(1, 1, 1, 1)
 
-    def ribbonCategory(self) -> QWidget:
-        return self.parentWidget()
+    # --- 滚动控制 ---
 
-    def addItem(self, item: QLayoutItem):
-        print('Warning: in SARibbonCategoryLayout cannot addItem, use addPannel() instead')
+    @property
+    def totalWidth(self) -> int:
+        return self._totalWidth
+
+    @property
+    def xBase(self) -> int:
+        return self._xBase
+
+    @xBase.setter
+    def xBase(self, value: int):
+        self._xBase = value
         self.invalidate()
 
-    def itemAt(self, index: int) -> QLayoutItem:
-        """返回pannel的layout"""
-        item = self.m_d.mItemList[index] if index <= len(self.m_d.mItemList)-1 else None
-        return item
+    def leftScrollButton(self) -> SARibbonCategoryScrollButton:
+        return self._leftScrollBtn
 
-    def takeAt(self, index: int) -> QLayoutItem:
-        return self.takePannelItem(index)
+    def rightScrollButton(self) -> SARibbonCategoryScrollButton:
+        return self._rightScrollBtn
 
-    def count(self) -> int:
-        return len(self.m_d.mItemList)
-
-    def takePannelItem(self, index: int) -> SARibbonCategoryLayoutItem:
-        if index < 0 or index > len(self.m_d.mItemList)-1:
-            return None
-        self.invalidate()
-        item = self.m_d.mItemList[index]
-        if item.widget():
-            item.widget().hide()
-        if item.separatorWidget:
-            item.separatorWidget.hide()
-        return item
-
-    def takePannel(self, pannel: QWidget) -> SARibbonCategoryLayoutItem:
-        for i, item in enumerate(self.m_d.mItemList):
-            if item.widget() == pannel:
-                return self.takePannelItem(i)
-        return None
+    # --- Pannel 管理 ---
 
     def addPannel(self, pannel: QWidget):
-        """追加一个pannel"""
-        self.insertPannel(self.count(), pannel)
+        self.insertPannel(len(self._items), pannel)
 
     def insertPannel(self, index: int, pannel: QWidget):
-        """插入一个pannel"""
-        index = max(0, index)
-        index = min(self.count(), index)
+        index = max(0, min(index, len(self._items)))
         item = SARibbonCategoryLayoutItem(pannel)
         item.separatorWidget = RibbonSubElementDelegate.createRibbonSeparatorWidget(self.parentWidget())
-        self.m_d.mItemList.insert(index, item)
-        self.invalidate()   # 标记需要重新计算尺寸
+        self._items.insert(index, item)
+        self.invalidate()
 
-    def setGeometry(self, rect: QRect):
-        self.m_d.mDirty = False
-        self.updateGeometryArr()
-        super().setGeometry(rect)
-        self.doLayout()
+    def takePannel(self, pannel: QWidget) -> bool:
+        for i, item in enumerate(self._items):
+            if item.widget() == pannel:
+                self._items.pop(i)
+                if item.separatorWidget:
+                    item.separatorWidget.hide()
+                    item.separatorWidget.deleteLater()
+                self.invalidate()
+                return True
+        return False
+
+    def pannelList(self) -> List[QWidget]:
+        return [item.widget() for item in self._items]
+
+    def pannelCount(self) -> int:
+        return len(self._items)
+
+    def pannelAt(self, index: int) -> Union[QWidget, None]:
+        if 0 <= index < len(self._items):
+            return self._items[index].widget()
+        return None
+
+    def pannelIndex(self, pannel: QWidget) -> int:
+        for i, item in enumerate(self._items):
+            if item.widget() == pannel:
+                return i
+        return -1
+
+    def movePannel(self, fr: int, to: int):
+        if fr == to:
+            return
+        to = max(0, min(to, len(self._items) - 1))
+        item = self._items.pop(fr)
+        self._items.insert(to, item)
+        self.invalidate()
+
+    # --- QLayout 接口 ---
+
+    def addItem(self, item: QLayoutItem):
+        pass  # 使用 addPannel 代替
+
+    def itemAt(self, index: int) -> Union[QLayoutItem, None]:
+        if 0 <= index < len(self._items):
+            return self._items[index]
+        return None
+
+    def takeAt(self, index: int) -> Union[QLayoutItem, None]:
+        if 0 <= index < len(self._items):
+            item = self._items.pop(index)
+            if item.separatorWidget:
+                item.separatorWidget.hide()
+                item.separatorWidget.deleteLater()
+            self.invalidate()
+            return item
+        return None
+
+    def count(self) -> int:
+        return len(self._items)
 
     def sizeHint(self) -> QSize:
-        return self.m_d.mSizeHint
+        return self._sizeHint
 
     def minimumSize(self) -> QSize:
-        return self.m_d.mSizeHint
+        return self._sizeHint
 
     def expandingDirections(self) -> int:
-        """SARibbonCategory充满整个stacked widget"""
         return Qt.Horizontal | Qt.Vertical
 
     def invalidate(self):
-        self.m_d.mDirty = True
+        self._dirty = True
         super().invalidate()
 
-    def updateGeometryArr(self):
-        """更新尺寸"""
-        category: QWidget = self.parentWidget()
-        categoryWidth = category.width()
+    def setGeometry(self, rect: QRect):
+        super().setGeometry(rect)
+        self._doLayout(rect)
+
+    # --- 布局计算 ---
+
+    def _contentSize(self) -> QSize:
+        w = self.parentWidget()
+        if not w:
+            return QSize(0, 0)
+        s = w.size()
         mag = self.contentsMargins()
-        height = category.height()
-        y = 0
-        if mag.isNull():
-            y = mag.top()
-            height -= mag.top() + mag.bottom()
-            categoryWidth -= mag.r + mag.left()
-        total = self.m_d.totalSizeHintWidth()
+        if not mag.isNull():
+            s.setHeight(s.height() - mag.top() - mag.bottom())
+            s.setWidth(s.width() - mag.left() - mag.right())
+        return s
+
+    def _totalSizeHintWidth(self) -> int:
+        mag = self.contentsMargins()
+        total = 0
+        if not mag.isNull():
+            total += mag.left() + mag.right()
+        for item in self._items:
+            if item.isEmpty():
+                continue
+            total += item.widget().sizeHint().width()
+            if item.separatorWidget:
+                total += item.separatorWidget.sizeHint().width()
+        return total
+
+    def _doLayout(self, rect: QRect):
+        category = self.parentWidget()
+        if not category:
+            return
+        contentSize = self._contentSize()
+        mag = self.contentsMargins()
+        y = mag.top() if not mag.isNull() else 0
+
+        total = self._totalSizeHintWidth()
         canExpandingCount = 0
         expandWidth = 0
-        # 判断是否超过总长度
-        if total > categoryWidth:
-            # 超过总长度，需要显示滚动按钮
-            if self.m_d.mXBase == 0:
-                # 已经移动到最左，需要可以向右移动
-                self.m_d.mIsRightScrollBtnShow = True
-                self.m_d.mIsLeftScrollBtnShow = False
-            elif self.m_d.mXBase <= categoryWidth - total:
-                # 已经移动到最右，需要可以向左移动
-                self.m_d.mIsRightScrollBtnShow = False
-                self.m_d.mIsLeftScrollBtnShow = True
-            else:
-                # 移动到中间两边都可以动
-                self.m_d.mIsRightScrollBtnShow = True
-                self.m_d.mIsLeftScrollBtnShow = True
-        else:
-            # total 小于 categoryWidth
-            self.m_d.mIsRightScrollBtnShow = False
-            self.m_d.mIsLeftScrollBtnShow = False
-            # 必须这里把mBaseX设置为0，防止滚动按钮调整尺寸导致category无法显示
-            self.m_d.mXBase = 0
-            for item in self.m_d.mItemList:
-                p: QWidget = item.widget()
-                if p.isExpanding():     # pannel可扩展
-                    canExpandingCount += 1
-                expandWidth = (categoryWidth-total)/canExpandingCount if canExpandingCount > 0 else 0
 
-        total = 0   # total重新计算
-        x = self.m_d.mXBase
-        # 先按照sizeHint设置所有的尺寸
-        for item in self.m_d.mItemList:
+        if total <= contentSize.width():
+            self._xBase = 0
+            for item in self._items:
+                if not item.isEmpty() and item.widget().isExpanding():
+                    canExpandingCount += 1
+            expandWidth = (contentSize.width() - total) / canExpandingCount if canExpandingCount > 0 else 0
+
+        # 计算每个item的geometry
+        calcTotal = 0
+        x = self._xBase
+        for item in self._items:
             if item.isEmpty():
                 if item.separatorWidget:
                     item.separatorWidget.hide()
                 item.mWillSetGeometry = QRect(0, 0, 0, 0)
                 item.mWillSetSeparatorGeometry = QRect(0, 0, 0, 0)
                 continue
-            p: QWidget = item.widget()
+            p = item.widget()
             if not p:
-                print('unknow widget in SARibbonCategoryLayout')
                 continue
             pSize = p.sizeHint()
-            separatorSize = item.separatorWidget.sizeHint() if item.separatorWidget else QSize(0, 0)
+            sepSize = item.separatorWidget.sizeHint() if item.separatorWidget else QSize(0, 0)
             if p.isExpanding():
-                # 可扩展，就把pannel扩展到最大
-                pSize.setWidth(pSize.width() + expandWidth)
+                pSize.setWidth(pSize.width() + int(expandWidth))
             w = pSize.width()
-            item.mWillSetGeometry = QRect(x, y, w, height)
+            item.mWillSetGeometry = QRect(int(x), int(y), int(w), int(contentSize.height()))
             x += w
-            total += w
-            w = separatorSize.width()
-            item.mWillSetSeparatorGeometry = QRect(x, y, w, height)
+            calcTotal += w
+            w = sepSize.width()
+            item.mWillSetSeparatorGeometry = QRect(int(x), int(y), int(w), int(contentSize.height()))
             x += w
-            total += w
-        self.m_d.mTotalWidth = total
-        cp = category.parentWidget()
-        parentHeight = height if not cp else cp.height()
-        parentWidth = total if not cp else cp.width()
-        self.m_d.mSizeHint = QSize(parentWidth, parentHeight)
+            calcTotal += w
 
-    def doLayout(self):
-        if self.m_d.mDirty:
-            self.updateGeometryArr()
-        category: QWidget = self.parentWidget()
-        # 两个滚动按钮的位置永远不变
-        self.m_d.mLeftScrollBtn.setGeometry(0, 0, 12, category.height())
-        self.m_d.mRightScrollBtn.setGeometry(category.width()-12, 0, 12, category.height())
-        showWidgets = list()
-        hideWidgets = list()
-        for item in self.m_d.mItemList:
+        self._totalWidth = calcTotal
+
+        # 滚动按钮显示逻辑
+        if calcTotal > contentSize.width():
+            if self._xBase == 0:
+                self._isRightScrollBtnShow = True
+                self._isLeftScrollBtnShow = False
+            elif self._xBase <= contentSize.width() - calcTotal:
+                self._isRightScrollBtnShow = False
+                self._isLeftScrollBtnShow = True
+            else:
+                self._isRightScrollBtnShow = True
+                self._isLeftScrollBtnShow = True
+        else:
+            self._isRightScrollBtnShow = False
+            self._isLeftScrollBtnShow = False
+
+        # sizeHint
+        cp = category.parentWidget()
+        parentHeight = cp.height() if cp else contentSize.height()
+        parentWidth = cp.width() if not cp else calcTotal
+        self._sizeHint = QSize(parentWidth, parentHeight)
+
+        # 应用geometry
+        self._applyGeometry()
+
+    def _applyGeometry(self):
+        category = self.parentWidget()
+        if not category:
+            return
+        # 滚动按钮
+        self._leftScrollBtn.setGeometry(1, 0, 12, category.height())
+        self._rightScrollBtn.setGeometry(category.width() - 13, 0, 12, category.height())
+
+        showWidgets = []
+        hideWidgets = []
+        for item in self._items:
+            if item.widget() is None:
+                continue
             if item.isEmpty():
                 hideWidgets.append(item.widget())
                 if item.separatorWidget:
                     hideWidgets.append(item.separatorWidget)
             else:
-                item.widget().setFixedSize(item.mWillSetGeometry.size())
-                item.widget().move(item.mWillSetGeometry.topLeft())
+                item.widget().setGeometry(item.mWillSetGeometry)
                 showWidgets.append(item.widget())
                 if item.separatorWidget:
                     item.separatorWidget.setGeometry(item.mWillSetSeparatorGeometry)
                     showWidgets.append(item.separatorWidget)
-        self.m_d.mRightScrollBtn.setVisible(self.m_d.mIsRightScrollBtnShow)
-        self.m_d.mLeftScrollBtn.setVisible(self.m_d.mIsLeftScrollBtnShow)
-        if self.m_d.mIsRightScrollBtnShow:
-            self.m_d.mRightScrollBtn.raise_()
-        if self.m_d.mIsLeftScrollBtnShow:
-            self.m_d.mLeftScrollBtn.raise_()
-        # 不在上面进行show和hide因为会触发SARibbonPannelLayout的重绘，导致循环绘制，非常影响效率
+
+        self._rightScrollBtn.setVisible(self._isRightScrollBtnShow)
+        self._leftScrollBtn.setVisible(self._isLeftScrollBtnShow)
+        if self._isRightScrollBtnShow:
+            self._rightScrollBtn.raise_()
+        if self._isLeftScrollBtnShow:
+            self._leftScrollBtn.raise_()
+
         for w in showWidgets:
             w.show()
         for w in hideWidgets:
             w.hide()
-
-    def pannels(self) -> List[QWidget]:
-        """返回所有pannels"""
-        res = [item.widget() for item in self.m_d.mItemList]
-        return res
-
-    # 槽函数
-    def onLeftScrollButtonClicked(self):
-        category: QWidget = self.parentWidget()
-        width = category.width()
-        # 求总宽
-        totalWidth = self.m_d.mTotalWidth
-        if totalWidth > width:
-            tmp = self.m_d.mXBase + width
-            if tmp > 0:
-                tmp = 0
-            self.m_d.mXBase = tmp
-        else:
-            self.m_d.mXBase = 0
-        self.invalidate()
-
-    def onRightScrollButtonClicked(self):
-        category: QWidget = self.parentWidget()
-        width = category.width()
-        # 求总宽
-        totalWidth = self.m_d.mTotalWidth
-        if totalWidth > width:
-            tmp = self.m_d.mXBase - width
-            if tmp < width - totalWidth:
-                tmp = width - totalWidth
-            self.m_d.mXBase = tmp
-        else:
-            self.m_d.mXBase = 0
-        self.invalidate()
-
-
