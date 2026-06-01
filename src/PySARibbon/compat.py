@@ -184,6 +184,8 @@ if PYQT_VERSION == 6:
     QFrame.NoFrame = QFrame.Shape.NoFrame
     QFrame.Box = QFrame.Shape.Box
     QFrame.Panel = QFrame.Shape.Panel
+    QFrame.HLine = QFrame.Shape.HLine
+    QFrame.VLine = QFrame.Shape.VLine
 
     # QSizePolicy shortcuts
     QSizePolicy.Expanding = QSizePolicy.Policy.Expanding

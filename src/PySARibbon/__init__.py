@@ -5,6 +5,7 @@
 """
 
 from .SAFramelessHelper import SAFramelessHelper
+from .SARibbonApplicationWidget import SARibbonApplicationWidget
 from .SARibbonBar import SARibbonBar
 from .SARibbonBarLayout import SARibbonBarLayout
 from .SARibbonButtonGroupWidget import SARibbonButtonGroupWidget
