@@ -16,4 +16,5 @@ from .SARibbonSeparatorWidget import SARibbonSeparatorWidget
 from .SARibbonStackedWidget import SARibbonStackedWidget
 from .SARibbonTabBar import SARibbonTabBar
 from .SARibbonToolButton import SARibbonToolButton
+from .SARibbonColorToolButton import SARibbonColorToolButton
 from .SARibbonLineWidgetContainer import SARibbonLineWidgetContainer
