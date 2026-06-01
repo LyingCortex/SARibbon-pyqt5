@@ -10,10 +10,9 @@
 """
 from typing import List
 
-from PyQt5.QtCore import Qt, QXmlStreamReader, QModelIndex, QDateTime, QXmlStreamWriter, QXmlStreamAttributes, \
-    QIODevice, QFile, QItemSelectionModel
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QWidget, QAction, QHBoxLayout, QVBoxLayout, QLabel, QComboBox, QLineEdit, QListView, \
+from ..compat import Qt, QXmlStreamReader, QModelIndex, QDateTime, QXmlStreamWriter, QXmlStreamAttributes, \
+    QIODevice, QFile, QItemSelectionModel, QStandardItemModel, QStandardItem, \
+    QWidget, QAction, QHBoxLayout, QVBoxLayout, QLabel, QComboBox, QLineEdit, QListView, \
     QSpacerItem, QPushButton, QRadioButton, QButtonGroup, QTreeView, QToolButton, QSizePolicy, QAbstractItemView, \
     QApplication, QMessageBox, QInputDialog
 
@@ -55,9 +54,9 @@ class SARibbonCustomizeWidget(QWidget):
 
     def setupActionsManager(self, mgr: QWidget):
         """设置action管理器"""
-        self.m_d.mActionMgr = mgr
-        if (self.m_d.mActionMgr):
+        if self.m_d.mActionMgr:
             self.m_d.mAcionModel.uninstallActionsManager()
+        self.m_d.mActionMgr = mgr
         self.m_d.mAcionModel.setupActionsManager(mgr)
         # 更新左边复选框
         tags = mgr.actionTags()
@@ -484,7 +483,7 @@ class SARibbonCustomizeWidget(QWidget):
 
             key: str = self.m_d.mActionMgr.key(act)
             d = SARibbonCustomizeData.makeChangeActionOrderCustomizeData(self.m_d.itemObjectName(categoryItem),
-                                                                         self.m_d.itemObjectName(pannelItem), key, self.m_d.mActionMgr, -1)
+                                                                         self.m_d.itemObjectName(pannelItem), key, self.m_d.mActionMgr, 1)
             self.m_d.mCustomizeDatas.append(d)
             r: int = item.row()
             item = pannelItem.takeChild(r)
@@ -906,7 +905,7 @@ class SARibbonCustomizeWidgetPrivate:
     def isCustomizeItem(self, item: QStandardItem) -> bool:
         if not item:
             return False
-        return item.data(SARibbonCustomizeWidget.CustomizeRole) == None
+        return item.data(SARibbonCustomizeWidget.CustomizeRole) == True
 
     def itemToCategory(self, item: QStandardItem) -> QWidget:
         """把item转换为category"""
@@ -945,6 +944,7 @@ class SARibbonCustomizeWidgetPrivate:
 
     def itemObjectName(self, item: QStandardItem) -> str:
         """获取item对应的object name"""
+        objName = ''
         if (self.isCustomizeItem(item)):
             # 说明是自定义的
             objName = item.data(SARibbonCustomizeWidget.CustomizeObjNameRole)

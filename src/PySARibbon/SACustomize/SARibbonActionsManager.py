@@ -24,8 +24,7 @@ SARibbonActionsManager.UserDefineActionTag值的基础上进行累加。
 同时遍历SARibbonMainWindow下所有@ref SARibbonPannel 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可
 """
 from typing import Any
-from PyQt5.QtCore import Qt, QObject, QAbstractListModel, QModelIndex, pyqtSignal
-from PyQt5.QtWidgets import QAction, QWidget
+from ..compat import Qt, QObject, QAbstractListModel, QModelIndex, pyqtSignal, QAction, QWidget
 
 
 class SARibbonActionsManagerPrivate:
@@ -88,8 +87,8 @@ class SARibbonActionsManager(QObject):
         needRemoveAct: list = list()
         total: list = list()
 
-        for i in self.m_d.mTagToActions:
-            total.append(i)
+        for actions_list in self.m_d.mTagToActions.values():
+            total.extend(actions_list)
 
         for a in oldacts:
             if not a in total:
@@ -191,7 +190,7 @@ class SARibbonActionsManager(QObject):
         for c in categorys:
             pannels: list = c.pannelList()
             for p in pannels:
-                categoryActions.union(self.autoRegisteWidgetActions(p, tag, False))
+                categoryActions.update(self.autoRegisteWidgetActions(p, tag, False))
             self.setTagName(tag, c.windowTitle())
             res[tag] = c
             tag += 1
@@ -236,8 +235,8 @@ class SARibbonActionsManager(QObject):
 
         for k in kws:
             for i in self.m_d.mActionToKey.keys():
-                if i.text().contains(k, Qt.CaseInsensitive):
-                    res.append(i.key())
+                if k.lower() in i.text().lower():
+                    res.append(i)
 
         return res
 
@@ -276,12 +275,12 @@ class SARibbonActionsManager(QObject):
             count = 0
             for jval in value:
                 if jval != act:
-                    tmpi.append(act)
+                    tmpi.append(jval)
                     count += 1
 
             if 0 == count:
                 # 说明这个tag没有内容
-                tagToActions.pop(tmpi)
+                tagToActions.pop(key)
                 deletedTags.append(key)
 
         # 删除mKeyToAction

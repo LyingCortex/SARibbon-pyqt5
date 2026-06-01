@@ -3,8 +3,7 @@
 @Module     SARibbonApplicationButton
 @Author     ROOT
 """
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton
+from ..compat import Qt, QPushButton
 
 
 class SARibbonApplicationButton(QPushButton):

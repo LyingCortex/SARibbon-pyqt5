@@ -3,7 +3,7 @@
 @Module     SARibbonControlButton
 @Author     ROOT
 """
-from PyQt5.QtWidgets import QToolButton
+from ..compat import QToolButton
 
 
 class SARibbonControlButton(QToolButton):

@@ -3,9 +3,7 @@
 @Module     SARibbonSeparatorWidget
 @Author     ROOT
 """
-from PyQt5.QtCore import QSize, QPoint
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QWidget, QSizePolicy
+from ..compat import QSize, QPoint, QPainter, QWidget, QSizePolicy
 
 
 class SARibbonSeparatorWidget(QWidget):

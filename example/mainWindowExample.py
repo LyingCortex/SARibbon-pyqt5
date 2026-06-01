@@ -150,6 +150,16 @@ class MainWindow(SARibbonMainWindow):
         r.setChecked(False)
         self.btnGroup.addButton(r, SARibbonBar.WpsLiteStyleTwoRow)
         pannel.addSmallWidget(r)
+        r = QRadioButton('use office single row', self)
+        r.setObjectName('use office single row')
+        r.setChecked(False)
+        self.btnGroup.addButton(r, SARibbonBar.OfficeStyleSingleRow)
+        pannel.addSmallWidget(r)
+        r = QRadioButton('use wps single row', self)
+        r.setObjectName('use wps single row')
+        r.setChecked(False)
+        self.btnGroup.addButton(r, SARibbonBar.WpsLiteStyleSingleRow)
+        pannel.addSmallWidget(r)
         self.btnGroup.buttonClicked[int].connect(self.onStyleClicked)
 
         pannel.addSeparator()   # 分割线

@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='PySARibbon',
-    version='1.0.2',
+    version='1.1.0',
     description='4种目前常见的ribbon样式.',
     # long_description=read('README.md'),
     keywords=('python', 'ribbon'),
-    license='GPL',
+    license='MIT',
 
     url='https://github.com/sardkit/pysaribbon',
     author='sardkit',
@@ -30,7 +30,7 @@ setup(
         'Topic :: Software Development',
 
         # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+        'License :: OSI Approved :: MIT License',
 
         'Programming Language :: Python :: 3',
     ],

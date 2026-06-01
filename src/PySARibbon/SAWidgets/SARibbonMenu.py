@@ -5,7 +5,7 @@
 """
 from typing import Union
 
-from PyQt5.QtWidgets import QMenu, QAction, QWidget, QSizePolicy, QWidgetAction
+from ..compat import QMenu, QAction, QWidget, QSizePolicy, QWidgetAction
 
 
 class SARibbonMenu(QMenu):

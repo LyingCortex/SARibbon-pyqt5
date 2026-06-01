@@ -9,8 +9,7 @@ SARibbonPannelLayout实际是一个列布局，每一列有2~3行，看窗口定
 核心函数：SARibbonPannelLayout.createItem
 """
 from typing import List, Union
-from PyQt5.QtCore import QRect, QSize, Qt
-from PyQt5.QtWidgets import QLayout, QAction, QLayoutItem, QWidget, QWidgetAction, QSizePolicy
+from .compat import QRect, QSize, Qt, QLayout, QAction, QLayoutItem, QWidget, QWidgetAction, QSizePolicy
 
 from .SAWidgets.SARibbonPannelItem import SARibbonPannelItem
 from .SAWidgets.SARibbonSeparatorWidget import SARibbonSeparatorWidget
@@ -26,28 +25,28 @@ class SARibbonPannelLayout(QLayout):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.m_items: List[SARibbonPannelItem] = list()
-        self.m_rowCount = 3         # 默认3行，可通过setRowCount()函数设置
-        self.m_columnCount = 0      # 记录有多少列
-        self.m_expandFlag = False   # 标记是否是会扩展的
-        self.m_sizeHint = QSize()   # sizeHint()返回的尺寸
-        self.m_dirty = True         # 用于标记是否需要刷新元素，参考QToolBarLayout源码
-        self.m_largeHeight = 0      # 记录大图标的高度
-        self.m_hasOptionAction = False              # Panel是否存在OptionAction
-        self.m_optionActionSize = QSize(12, 12)     # Panel中OptionAction的尺寸
+        self._items: List[SARibbonPannelItem] = list()
+        self._rowCount = 3         # 默认3行，可通过setRowCount()函数设置
+        self._columnCount = 0      # 记录有多少列
+        self._expandFlag = False   # 标记是否是会扩展的
+        self._sizeHint = QSize()   # sizeHint()返回的尺寸
+        self._dirty = True         # 用于标记是否需要刷新元素，参考QToolBarLayout源码
+        self._largeHeight = 0      # 记录大图标的高度
+        self._hasOptionAction = False              # Panel是否存在OptionAction
+        self._optionActionSize = QSize(12, 12)     # Panel中OptionAction的尺寸
 
         self.setSpacing(1)
 
     def setRowCount(self, count: int):
-        self.m_rowCount = count
+        self._rowCount = count
 
     def setOptionAction(self, on: bool, size: QSize):
-        self.m_hasOptionAction = on
-        self.m_optionActionSize = size
+        self._hasOptionAction = on
+        self._optionActionSize = size
 
     def indexOf(self, action: QAction) -> int:
         """通过action查找索引，用于actionEvent添加action用"""
-        for i, item in enumerate(self.m_items):
+        for i, item in enumerate(self._items):
             if item.action == action:
                 return i
         return -1
@@ -55,7 +54,7 @@ class SARibbonPannelLayout(QLayout):
     def addItem(self, item: QLayoutItem):
         # print('addItem(): please use addAction() instead')
         # super().addItem(item)
-        self.m_items.append(item)
+        self._items.append(item)
         self.invalidate()  # 标记需要重新计算尺寸
         return
 
@@ -83,7 +82,7 @@ class SARibbonPannelLayout(QLayout):
         button.setFocusPolicy(Qt.NoFocus)
         buttonType = SARibbonToolButton.LargeButton if rp == SARibbonPannelItem.RPLarge else SARibbonToolButton.SmallButton
         if buttonType == SARibbonToolButton.LargeButton:
-            ltp = SARibbonToolButton.Lite if self.m_rowCount == 2 else SARibbonToolButton.Normal
+            ltp = SARibbonToolButton.Lite if self._rowCount == 2 else SARibbonToolButton.Normal
             button.setLargeButtonType(ltp)
 
         button.setButtonType(buttonType)
@@ -92,57 +91,57 @@ class SARibbonPannelLayout(QLayout):
         return self.addWidget(button, rp)
 
     def itemAt(self, index: int) -> Union[None, QLayoutItem]:
-        if index < 0 or index >= len(self.m_items):
+        if index < 0 or index >= len(self._items):
             return None
-        return self.m_items[index]
+        return self._items[index]
 
     def takeAt(self, index: int) -> Union[None, QLayoutItem]:
-        if index < 0 or index >= len(self.m_items):
+        if index < 0 or index >= len(self._items):
             return None
-        item = self.m_items[index]
-        self.m_items.pop(index)
+        item = self._items[index]
+        self._items.pop(index)
         item.widget().hide()
         item.widget().deleteLater()
         self.invalidate()
         return item
 
     def count(self) -> int:
-        return len(self.m_items)
+        return len(self._items)
 
     def isEmpty(self) -> bool:
-        return bool(self.m_items)
+        return not bool(self._items)
 
     def invalidate(self):
-        self.m_dirty = True
+        self._dirty = True
         super().invalidate()
 
     def expandingDirections(self) -> int:
         return Qt.Horizontal
 
     def setGeometry(self, rect: QRect):
-        self.m_dirty = False
+        self._dirty = False
         self.updateGeomArray(rect)
         # super().setGeometry(rect)
         self.layoutActions()
 
     def minimumSize(self) -> QSize:
-        return self.m_sizeHint
+        return self._sizeHint
 
     def sizeHint(self) -> QSize:
-        return self.m_sizeHint
+        return self._sizeHint
 
     def pannelItem(self, action: QAction) -> Union[None, SARibbonPannelItem]:
         """通过action获取SARibbonPannelItem"""
         index = self.indexOf(action)
         if index >= 0:
-            return self.m_items[index]
+            return self._items[index]
         return None
 
     def lastItem(self) -> Union[None, SARibbonPannelItem]:
         """获取最后一个添加的item"""
-        if not self.m_items:
+        if not self._items:
             return None
-        return self.m_items[-1]
+        return self._items[-1]
 
     def lastWidget(self) -> Union[None, QWidget]:
         """获取最后生成的窗口"""
@@ -159,7 +158,7 @@ class SARibbonPannelLayout(QLayout):
             return high
         if pannel.pannelLayoutMode() == SARibbonPannelLayout.ThreeRowMode:
             high = G_HIGHER_MODE_HEIGHT
-        elif pannel.pannelLayoutMode() == SARibbonPannelLayout.ThreeRowMode:
+        elif pannel.pannelLayoutMode() == SARibbonPannelLayout.TwoRowMode:
             high = G_LOWER_MODE_HEIGHT
         return high
 
@@ -173,25 +172,25 @@ class SARibbonPannelLayout(QLayout):
             to = count - 1
         if fr == to:    # 位置相同直接返回
             return
-        item = self.m_items[fr]
-        self.m_items.pop(fr)
+        item = self._items[fr]
+        self._items.pop(fr)
         if to == count - 1:
-            self.m_items.append(item)
+            self._items.append(item)
         else:
-            self.m_items.insert(to, item)
+            self._items.insert(to, item)
         self.invalidate()
 
     def isDirty(self) -> bool:
         """判断是否需要重新布局"""
-        return self.m_dirty
+        return self._dirty
 
     def layoutActions(self):
         """布局所有action"""
-        if self.m_dirty:
+        if self._dirty:
             self.updateGeomArray(self.geometry())
         showWidgets = list()
         hideWidgets = list()
-        for item in self.m_items:
+        for item in self._items:
             if item.isEmpty():
                 hideWidgets.append(item.widget())
             else:
@@ -248,11 +247,11 @@ class SARibbonPannelLayout(QLayout):
         titleH = pannel.titleHeight() if hasattr(pannel, 'titleHeight') else 0
         magin = self.contentsMargins()
         spacing = self.spacing()
-        rowCount = self.m_rowCount  # rowcount 是ribbon的行，有2行和3行两种
+        rowCount = self._rowCount  # rowcount 是ribbon的行，有2行和3行两种
 
         largeH = height - (magin.top() + magin.bottom()) - titleH
         smallH = (largeH - (rowCount - 1) * spacing) / rowCount
-        self.m_largeHeight = largeH
+        self._largeHeight = largeH
         # row用于记录下个item应该属于第几行，item->rowIndex用于记录当前处于第几行
         row, column = 0, 0
         columMaxWidth = 0   # 记录每列最大的宽度
@@ -267,27 +266,37 @@ class SARibbonPannelLayout(QLayout):
         smly0 = magin.top()
         smly1 = magin.top() + smallH + spacing
         smly2 = magin.top() + 2 * (smallH + spacing)
-        for i, item in enumerate(self.m_items):
+        for i, item in enumerate(self._items):
             if item.isEmpty():
                 item.rowIndex = -1
                 item.columnIndex = -1
                 continue
 
             if item.widget() and (item.widget().sizePolicy().horizontalPolicy() & QSizePolicy.ExpandFlag):
-                self.m_expandFlag = True
+                self._expandFlag = True
             exp = item.expandingDirections()
             rp = item.rowProportion
             if SARibbonPannelItem.RPNone == rp:
                 rp = SARibbonPannelItem.RPLarge if (exp & Qt.Vertical) else SARibbonPannelItem.RPSmall
             hint = item.sizeHint()
-            if SARibbonPannelItem.RPLarge == rp:
+
+            # SingleRowMode: 所有item在同一行横向排列
+            if 1 == rowCount:
+                item.rowIndex = 0
+                item.columnIndex = column
+                item.itemWillSetGeometry = QRect(int(x), int(magin.top()), int(hint.width()), int(smallH))
+                x += hint.width() + spacing
+                row = 0
+                column += 1
+                columMaxWidth = 0
+            elif SARibbonPannelItem.RPLarge == rp:
                 # 在Large模式，如果不是处于新列的第一行，就需要进行换列处理
                 if row != 0:
                     x += columMaxWidth + spacing
                     column += 1
                 item.rowIndex = 0
                 item.columnIndex = column
-                item.itemWillSetGeometry = QRect(x, magin.top(), hint.width(), largeH)
+                item.itemWillSetGeometry = QRect(int(x), int(magin.top()), int(hint.width()), int(largeH))
                 # 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
                 x += hint.width() + spacing
                 row = 0
@@ -302,12 +311,12 @@ class SARibbonPannelLayout(QLayout):
                 item.rowIndex = row
                 item.columnIndex = column
                 if row == 0:
-                    item.itemWillSetGeometry = QRect(x, medy0, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(medy0), int(hint.width()), int(smallH))
                     row = 1
                     columMaxWidth = hint.width()
                     lastRow0RP = SARibbonPannelItem.RPMedium
                 else:
-                    item.itemWillSetGeometry = QRect(x, medy1, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(medy1), int(hint.width()), int(smallH))
                     # 换列
                     x += max(columMaxWidth, hint.width()) + spacing
                     row = 0
@@ -317,14 +326,14 @@ class SARibbonPannelLayout(QLayout):
                 item.rowIndex = row
                 item.columnIndex = column
                 if row == 0:
-                    item.itemWillSetGeometry = QRect(x, smly0, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(smly0), int(hint.width()), int(smallH))
                     columMaxWidth = hint.width()
                     row = 1
                     lastRow0RP = SARibbonPannelItem.RPSmall
                 elif row == 1:
                     # 若第一行是Medium，按Medium排列
                     y1 = medy1 if lastRow0RP == SARibbonPannelItem.RPMedium else smly1
-                    item.itemWillSetGeometry = QRect(x, y1, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(y1), int(hint.width()), int(smallH))
                     if 2 == rowCount or lastRow0RP == SARibbonPannelItem.RPMedium:
                         x += max(columMaxWidth, hint.width()) + spacing
                         row = 0
@@ -334,7 +343,7 @@ class SARibbonPannelLayout(QLayout):
                         row = 2
                         columMaxWidth = max(columMaxWidth, hint.width())
                 else:
-                    item.itemWillSetGeometry = QRect(x, smly2, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(smly2), int(hint.width()), int(smallH))
                     # 换列
                     x += max(columMaxWidth, hint.width()) + spacing
                     row = 0
@@ -342,33 +351,33 @@ class SARibbonPannelLayout(QLayout):
                     columMaxWidth = 0
 
             # 最后1个元素，更新totalWidth
-            if i == len(self.m_items) - 1:
+            if i == len(self._items) - 1:
                 # 触发了换列，直接等于column索引
                 # 没有触发换列，真实列数等于column+1
                 if item.columnIndex != column:
-                    self.m_columnCount = column
+                    self._columnCount = column
                     totalWidth = x + magin.right()
                 else:
-                    self.m_columnCount = column + 1
+                    self._columnCount = column + 1
                     totalWidth = x + magin.right() + columMaxWidth + spacing
 
         # 在有optionButton的2行模式的情况下，需要调整totalWidth
-        if rowCount == 2 and self.m_hasOptionAction:
-            totalWidth += self.m_optionActionSize.width()
+        if rowCount == 2 and self._hasOptionAction:
+            totalWidth += self._optionActionSize.width()
 
         # 在设置完所有窗口后，再设置扩展属性的窗口
         if totalWidth < setRect.width():
             self.recalcExpandGeomArray(setRect)
-        self.m_sizeHint = QSize(totalWidth, height)
+        self._sizeHint = QSize(totalWidth, height)
 
     def recalcExpandGeomArray(self, setrect: QRect):
         """重新计算扩展item，此函数必须在updateGeomArray()函数之后调用"""
-        expandwidth = setrect.width() - self.m_sizeHint.width()     # 能扩展的尺寸
+        expandwidth = setrect.width() - self._sizeHint.width()     # 能扩展的尺寸
         if expandwidth <= 0:
             return
 
         columnExpandInfo = dict()   # columnExpandInfo用于记录可以水平扩展的列和控件
-        for item in self.m_items:
+        for item in self._items:
             if not item.isEmpty() and (item.expandingDirections() & Qt.Horizontal):
                 value = columnExpandInfo.get(item.columnIndex, None)
                 if not value:
@@ -385,12 +394,13 @@ class SARibbonPannelLayout(QLayout):
             return
 
         oneColCanexpandWidth = expandwidth / len(columnExpandInfo)
-        for key, value in columnExpandInfo.items():
+        for key in list(columnExpandInfo.keys()):
+            value = columnExpandInfo[key]
             oldColumnWidth, columnMaximumWidth = self.columnWidthInfo(key, value['oldColumnWidth'], value['columnMaximumWidth'])
             value['oldColumnWidth'] = oldColumnWidth
             value['columnMaximumWidth'] = columnMaximumWidth
             if oldColumnWidth < 0 or oldColumnWidth > columnMaximumWidth:
-                columnExpandInfo.pop(key)
+                del columnExpandInfo[key]
                 continue
             # 开始调整
             colwidth = oneColCanexpandWidth + oldColumnWidth
@@ -398,7 +408,7 @@ class SARibbonPannelLayout(QLayout):
         # 重新调整尺寸，由于会涉及其他列的变更，因此需要所有都遍历一遍
         for key, value in columnExpandInfo.items():
             moveXLen = value['columnExpandedWidth'] - value['oldColumnWidth']
-            for item in self.m_items:
+            for item in self._items:
                 if item.isEmpty() or item.columnIndex < key:
                     continue
                 if item.columnIndex == key:     # 此列的扩展
@@ -413,7 +423,7 @@ class SARibbonPannelLayout(QLayout):
     def columnWidthInfo(self, colindex: int, width: int, maximum: int) -> (int, int):
         rwidth = width
         rmaximum = maximum
-        for item in self.m_items:
+        for item in self._items:
             if not item.isEmpty() and item.columnIndex == colindex:
                 rwidth = max(rwidth, item.itemWillSetGeometry.width())
                 rmaximum = max(rmaximum, item.widget().maximumWidth())
@@ -422,3 +432,4 @@ class SARibbonPannelLayout(QLayout):
     # PannelLayoutMode
     ThreeRowMode = 0
     TwoRowMode = 1
+    SingleRowMode = 2

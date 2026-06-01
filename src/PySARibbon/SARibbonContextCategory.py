@@ -7,9 +7,7 @@
 """
 from typing import Any, List
 
-from PyQt5.QtCore import QObject, pyqtSignal, QEvent
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QWidget
+from .compat import QObject, pyqtSignal, QEvent, QColor, QWidget
 
 from .SARibbonCategory import SARibbonCategory
 
@@ -70,6 +68,10 @@ class SARibbonContextCategory(QObject):
                 self.categoryDataList.pop(i)
                 return True
         return False
+
+    def compare(self, other) -> bool:
+        """判断是否是同一个上下文标签"""
+        return self is other
 
     def parentWidget(self) -> QWidget:
         """获取父级窗口"""

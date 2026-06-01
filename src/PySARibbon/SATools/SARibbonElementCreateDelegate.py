@@ -3,8 +3,7 @@
 @Module     SARibbonElementCreateDelegate
 @Author     ROOT
 """
-from PyQt5.QtCore import Qt, QMargins
-from PyQt5.QtGui import QColor
+from ..compat import Qt, QMargins, QColor
 
 from ..SAWidgets.SARibbonTabBar import SARibbonTabBar
 from ..SAWidgets.SARibbonApplicationButton import SARibbonApplicationButton
@@ -26,10 +25,12 @@ class SARibbonStyleOption:
         self.mainbarHeightWPSStyleThreeRow: int = 130       # WpsLiteStyle 样式下的mainbar高度
         self.mainbarHeightOfficeStyleTwoRow: int = 134      # OfficeStyleTwoRow 样式下的mainbar高度
         self.mainbarHeightWPSStyleTwoRow: int = 104         # WpsLiteStyleTwoRow 样式下的mainbar高度
+        self.mainbarHeightOfficeStyleSingleRow: int = 100   # OfficeStyleSingleRow 样式下的mainbar高度
+        self.mainbarHeightWPSStyleSingleRow: int = 80       # WpsLiteStyleSingleRow 样式下的mainbar高度
         self.titleBarHeight: int = 30                       # 标题栏高度
         self.tabBarHeight: int = 25                         # ribbon tab 的高度
         self.titleTextColor: QColor = Qt.black              # 标题颜色
-        self.widgetBord: QMargins = QMargins(5, 1, 5, 5)    # 整个ribbonbar的四个边框
+        self.widgetBorder: QMargins = QMargins(5, 1, 5, 5)    # 整个ribbonbar的四个边框
         self.tabBarBaseLineColor: QColor = QColor(186, 201, 219)     # tabbar 底部线条颜色
 
 

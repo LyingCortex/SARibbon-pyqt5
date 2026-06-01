@@ -7,9 +7,7 @@
 组负责显示管理Gallery Item
 """
 from typing import List, Union
-from PyQt5.QtCore import Qt, QModelIndex, QSize, pyqtSignal, QAbstractListModel, QItemSelectionModel
-from PyQt5.QtGui import QIcon, QPainter
-from PyQt5.QtWidgets import QAction, QStyledItemDelegate, QStyleOptionViewItem, QStyle, QListView
+from ..compat import Qt, QModelIndex, QSize, pyqtSignal, QAbstractListModel, QItemSelectionModel, QIcon, QPainter, QAction, QStyledItemDelegate, QStyleOptionViewItem, QStyle, QListView
 
 
 class SARibbonGalleryItem:
@@ -194,16 +192,19 @@ class SARibbonGalleryGroupModel(QAbstractListModel):
 
     def append(self, item: SARibbonGalleryItem):
         row = len(self.m_items)
-        self.beginInsertRows(QModelIndex(), row, row+1)
+        self.beginInsertRows(QModelIndex(), row, row)
         self.m_items.append(item)
         self.endInsertRows()
 
 
 class SARibbonGalleryGroup(QListView):
+    # 信号
+    groupTitleChanged = pyqtSignal(str)
+
     def __init__(self, parent):
         super().__init__(parent)
         self.enableIconText_ = False
-        self.groupTitle = ''
+        self._groupTitle = ''
 
         self.setupGroupModel()
         self.setViewMode(QListView.IconMode)
@@ -268,11 +269,11 @@ class SARibbonGalleryGroup(QListView):
         return self.enableIconText_
 
     def setGroupTitle(self, title: str):
-        self.groupTitle = title
-        self.groupTitleChanged.emit(self.groupTitle)
+        self._groupTitle = title
+        self.groupTitleChanged.emit(self._groupTitle)
 
     def groupTitle(self) -> str:
-        return self.groupTitle
+        return self._groupTitle
 
     def selectByIndex(self, i: int):
         if not self.groupModel():
@@ -290,9 +291,6 @@ class SARibbonGalleryGroup(QListView):
         act = item.action()
         if act:
             act.activate(QAction.Trigger)
-
-    # 信号
-    groupTitleChanged = pyqtSignal(str)
 
     # 枚举
     LargeIconWithText = 0

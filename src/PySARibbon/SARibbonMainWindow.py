@@ -16,9 +16,7 @@ SARibbonMainWindow是个无边框窗体，继承自QMainWindow，其构造函数
 @ref SARibbonMainWindow 提供了几种常用的ribbon样式，样式可见@ref RibbonTheme
 通过@ref setRibbonTheme 可改变ribbon的样式，用户也可通过qss自己定义自己的样式
 """
-from PyQt5.QtCore import QFile, QIODevice
-from PyQt5.QtCore import QObject, QEvent
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QMenuBar
+from .compat import QFile, QIODevice, QObject, QEvent, QMainWindow, QApplication, QWidget, QMenuBar
 
 from .SAFramelessHelper import SAFramelessHelper
 from .SAWindowButtonGroup import SAWindowButtonGroup
@@ -45,6 +43,7 @@ class SARibbonMainWindow(QMainWindow):
         return self.m_ribbonBar
 
     def setRibbonTheme(self, theme):
+        self.m_currentRibbonTheme = theme
         if theme == SARibbonMainWindow.NormalTheme:
             self.loadTheme(':/theme/resource/default.qss')
         elif theme == SARibbonMainWindow.Office2013:

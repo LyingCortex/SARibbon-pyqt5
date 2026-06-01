@@ -47,17 +47,16 @@ de setupRibbonUi():
     ......
 @endcode
 """
-import PySARibbon.resource_rc
+from . import resource_rc
 from typing import List, Union
-from PyQt5.QtCore import Qt, QSize, pyqtSignal, QObject, QEvent, QRect, QPoint, QMargins
-from PyQt5.QtGui import QIcon, QPainter, QColor, QResizeEvent, QMouseEvent, QPen, QHoverEvent, QCursor
-from PyQt5.QtWidgets import QMenuBar, QAbstractButton, QApplication, QAction, QFrame, QStyle
+from .compat import Qt, QSize, pyqtSignal, QObject, QEvent, QRect, QPoint, QMargins, QIcon, QPainter, QColor, QResizeEvent, QMouseEvent, QPen, QHoverEvent, QCursor, QMenuBar, QAbstractButton, QApplication, QAction, QFrame, QStyle
 
 from .SAWidgets.SARibbonStackedWidget import SARibbonStackedWidget
 from .SAWidgets.SARibbonTabBar import SARibbonTabBar
 from .SATools.SARibbonElementManager import RibbonSubElementStyleOpt, RibbonSubElementDelegate
 from .SARibbonButtonGroupWidget import SARibbonButtonGroupWidget
 from .SARibbonQuickAccessBar import SARibbonQuickAccessBar
+from .SARibbonBarLayout import SARibbonBarLayout
 from .SARibbonPannel import SARibbonPannel
 from .SARibbonCategory import SARibbonCategory
 from .SARibbonContextCategory import SARibbonContextCategory
@@ -87,7 +86,7 @@ class SARibbonBarPrivate:
         self.lastShowStyle: int = SARibbonBar.OfficeStyle
         self.currentRibbonMode: int = SARibbonBar.NormalRibbonMode
 
-        self.applitionButton: QAbstractButton = RibbonSubElementDelegate.createRibbonApplicationButton(self.mainClass)
+        self.applicationButton: QAbstractButton = RibbonSubElementDelegate.createRibbonApplicationButton(self.mainClass)
         self.ribbonTabBar: SARibbonTabBar = RibbonSubElementDelegate.createRibbonTabBar(self.mainClass)
         self.stackedContainerWidget: SARibbonStackedWidget = RibbonSubElementDelegate.createRibbonStackedWidget(self.mainClass)
         self.quickAccessBar: SARibbonQuickAccessBar = SARibbonQuickAccessBar(self.mainClass)
@@ -110,8 +109,8 @@ class SARibbonBarPrivate:
 
     def init(self):
         """初始化ApplicationButton, RibbonTabBar, StackedContainerWidget, QuickAccessBar相关设置"""
-        self.applitionButton.setObjectName("objSAApplicationButton")
-        self.applitionButton.clicked.connect(self.mainClass.applitionButtonClicked)
+        self.applicationButton.setObjectName("objSAApplicationButton")
+        self.applicationButton.clicked.connect(self.mainClass.applicationButtonClicked)
 
         self.ribbonTabBar.setObjectName("objSARibbonTabBar")
         # self.ribbonTabBar.setDrawBase(False)
@@ -138,8 +137,8 @@ class SARibbonBarPrivate:
             btn.setObjectName('objSAApplicationButton')
         btn.setVisible(True)
         btn.move(0, RibbonSubElementStyleOpt.titleBarHeight)
-        self.applitionButton = btn
-        self.applitionButton.clicked.connect(self.mainClass.applitionButtonClicked)
+        self.applicationButton = btn
+        self.applicationButton.clicked.connect(self.mainClass.applicationButtonClicked)
 
     def isContainContextCategoryInList(self, contextCategory: SARibbonContextCategory) -> bool:
         for iContextCategory in self.currentShowingContextCategory:
@@ -173,8 +172,13 @@ class SARibbonBarPrivate:
 
 
 class SARibbonBar(QMenuBar):
+    # 信号
+    applicationButtonClicked = pyqtSignal()       # 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+    currentRibbonTabChanged = pyqtSignal(int)   # 标签页变化触发的信号
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._barLayout = SARibbonBarLayout(self)
         self.m_d = SARibbonBarPrivate(self)
         self.m_d.init()
         self.setRibbonStyle(SARibbonBar.OfficeStyle)
@@ -186,12 +190,17 @@ class SARibbonBar(QMenuBar):
         QApplication.postEvent(self, QResizeEvent(self.size(), self.size()))
 
     @staticmethod
-    def checkTwoRowStyle(style) -> bool:    # C++为isTwoRowStyle
+    def checkTwoRowStyle(style) -> bool:
         """判断RibbonStyle是否为2行模式"""
-        return style & 0xFF00 > 0
+        return (style & 0xFF00) == 0x0100
 
     @staticmethod
-    def checkOfficeStyle(style) -> bool:    # C++为isOfficeStyle
+    def checkSingleRowStyle(style) -> bool:
+        """判断RibbonStyle是否为单行模式"""
+        return (style & 0xFF00) == 0x0200
+
+    @staticmethod
+    def checkOfficeStyle(style) -> bool:
         """判断是否是office样式"""
         return style & 0xFF == 0
 
@@ -202,7 +211,7 @@ class SARibbonBar(QMenuBar):
         """
         获取applicationButton
         """
-        return self.m_d.applitionButton
+        return self.m_d.applicationButton
 
     def setApplicationButton(self, btn: QAbstractButton):
         """
@@ -236,7 +245,7 @@ class SARibbonBar(QMenuBar):
         else:
             category: SARibbonCategory = __args[0]
             category.setRibbonBar(self)
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
+            mode = self._pannelLayoutMode()
             category.setRibbonPannelLayoutMode(mode)
             index = self.m_d.ribbonTabBar.addTab(category.windowTitle())
 
@@ -267,7 +276,7 @@ class SARibbonBar(QMenuBar):
             category: SARibbonCategory = __args[0]
             index = __args[1]
             i = self.m_d.ribbonTabBar.insertTab(index, category.windowTitle())
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
+            mode = self._pannelLayoutMode()
             category.setRibbonPannelLayoutMode(mode)
 
             tabdata = _SARibbonTabData()
@@ -418,7 +427,7 @@ class SARibbonBar(QMenuBar):
         contextCategoryData.contextCategory = context
         for i in range(context.categoryCount()):
             category = context.categoryPage(i)
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
+            mode = self._pannelLayoutMode()
             category.setRibbonPannelLayoutMode(mode)
             index = self.m_d.ribbonTabBar.addTab(category.windowTitle())
             contextCategoryData.tabPageIndex.append(index)
@@ -541,6 +550,115 @@ class SARibbonBar(QMenuBar):
         """快速响应栏"""
         return self.m_d.quickAccessBar
 
+    # --- 新增 API（对齐 C++ v2.8.0）---
+
+    def setTabBarHeight(self, h: int):
+        """设置 tabbar 高度"""
+        RibbonSubElementStyleOpt.tabBarHeight = h
+        self.updateRibbonElementGeometry()
+
+    def setTitleBarHeight(self, h: int):
+        """设置标题栏高度"""
+        RibbonSubElementStyleOpt.titleBarHeight = h
+        self.updateRibbonElementGeometry()
+
+    def setWindowTitleTextColor(self, color):
+        """设置标题文字颜色"""
+        RibbonSubElementStyleOpt.titleTextColor = color
+        self.update()
+
+    def windowTitleTextColor(self):
+        return RibbonSubElementStyleOpt.titleTextColor
+
+    def setTabBarBaseLineColor(self, color):
+        """设置 tabbar 底线颜色"""
+        RibbonSubElementStyleOpt.tabBarBaseLineColor = color
+        self.update()
+
+    def tabBarBaseLineColor(self):
+        return RibbonSubElementStyleOpt.tabBarBaseLineColor
+
+    def setContextCategoryColorList(self, colors: list):
+        """设置上下文标签的颜色列表"""
+        self.m_d.mContextCategoryColorList = colors
+        self.m_d.mContextCategoryColorListIndex = -1
+
+    def setCategoriesVisible(self, categories: list, visible: bool):
+        """批量设置 category 的显示/隐藏"""
+        for c in categories:
+            if visible:
+                self.showCategory(c)
+            else:
+                self.hideCategory(c)
+
+    def setEnableShowPanelTitle(self, enable: bool):
+        """设置是否显示 Panel 标题"""
+        categorys = self.categoryPages()
+        for c in categorys:
+            for p in c.pannelList():
+                p.setEnableShowTitle(enable)
+
+    def isEnableShowPanelTitle(self) -> bool:
+        """判断是否显示 Panel 标题（取第一个 panel 的状态）"""
+        categorys = self.categoryPages()
+        for c in categorys:
+            panels = c.pannelList()
+            if panels:
+                return panels[0].isEnableShowTitle()
+        return True
+
+    def setTitleVisible(self, visible: bool):
+        """设置标题是否可见"""
+        self.m_d._titleVisible = visible
+        self.update()
+
+    def isTitleVisible(self) -> bool:
+        return getattr(self.m_d, '_titleVisible', True)
+
+    def setTitleIconVisible(self, visible: bool):
+        """设置标题图标是否可见"""
+        self.m_d._titleIconVisible = visible
+        self.update()
+
+    def isTitleIconVisible(self) -> bool:
+        return getattr(self.m_d, '_titleIconVisible', True)
+
+    def isLooseStyle(self) -> bool:
+        """判断是否为宽松风格（等同 isOfficeStyle）"""
+        return self.isOfficeStyle()
+
+    def isCompactStyle(self) -> bool:
+        """判断是否为紧凑风格（等同非 Office 风格）"""
+        return not self.isOfficeStyle()
+
+    def isThreeRowStyle(self) -> bool:
+        """判断是否为三行模式"""
+        return not self.isTwoRowStyle() and not self.isSingleRowStyle()
+
+    def setEnableWordWrap(self, enable: bool):
+        """设置所有按钮是否允许文字换行，级联到所有 Category/Panel/Button"""
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                p.setEnableWordWrap(enable)
+
+    def isEnableWordWrap(self) -> bool:
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                return p.isEnableWordWrap()
+        return False
+
+    def setEnableIconRightText(self, enable: bool):
+        """设置所有按钮强制图标左文字右，级联到所有 Category/Panel/Button"""
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                p.setEnableIconRightText(enable)
+
+    def isEnableIconRightText(self) -> bool:
+        for c in self.categoryPages():
+            for p in c.pannelList():
+                return p.isEnableIconRightText()
+        return False
+
     def setRibbonStyle(self, style):
         """设置ribbonbar的风格，此函数会重新设置所有元素"""
         self.m_d.ribbonStyle = style
@@ -579,6 +697,18 @@ class SARibbonBar(QMenuBar):
     def isTwoRowStyle(self) -> bool:
         """判断当前的样式是否为两行"""
         return SARibbonBar.checkTwoRowStyle(self.currentRibbonStyle())
+
+    def isSingleRowStyle(self) -> bool:
+        """判断当前的样式是否为单行"""
+        return SARibbonBar.checkSingleRowStyle(self.currentRibbonStyle())
+
+    def _pannelLayoutMode(self) -> int:
+        """根据当前样式返回对应的PannelLayoutMode"""
+        if self.isSingleRowStyle():
+            return SARibbonPannel.SingleRowMode
+        elif self.isTwoRowStyle():
+            return SARibbonPannel.TwoRowMode
+        return SARibbonPannel.ThreeRowMode
 
     def isOfficeStyle(self) -> bool:
         """判断当前的样式是否为office样式"""
@@ -637,10 +767,12 @@ class SARibbonBar(QMenuBar):
             SARibbonBar.WpsLiteStyle: RibbonSubElementStyleOpt.mainbarHeightWPSStyleThreeRow,
             SARibbonBar.OfficeStyleTwoRow: RibbonSubElementStyleOpt.mainbarHeightOfficeStyleTwoRow,
             SARibbonBar.WpsLiteStyleTwoRow: RibbonSubElementStyleOpt.mainbarHeightWPSStyleTwoRow,
+            SARibbonBar.OfficeStyleSingleRow: RibbonSubElementStyleOpt.mainbarHeightOfficeStyleSingleRow,
+            SARibbonBar.WpsLiteStyleSingleRow: RibbonSubElementStyleOpt.mainbarHeightWPSStyleSingleRow,
         }
         return styleDict.get(currentStyle, RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow)
 
-    def applitionButtonWidth(self) -> int:
+    def applicationButtonWidth(self) -> int:
         """
         应用按钮的宽度
         """
@@ -660,8 +792,13 @@ class SARibbonBar(QMenuBar):
     def updateRibbonElementGeometry(self):
         """根据样式调整SARibbonCategory的布局形式"""
         categorys = self.categoryPages()
+        if self.isSingleRowStyle():
+            mode = SARibbonPannel.SingleRowMode
+        elif self.isTwoRowStyle():
+            mode = SARibbonPannel.TwoRowMode
+        else:
+            mode = SARibbonPannel.ThreeRowMode
         for c in categorys:
-            mode = SARibbonPannel.TwoRowMode if self.isTwoRowStyle() else SARibbonPannel.ThreeRowMode
             c.setRibbonPannelLayoutMode(mode)
         if SARibbonBar.NormalRibbonMode == self.currentRibbonState():
             self.setFixedHeight(self.mainBarHeight())
@@ -669,109 +806,12 @@ class SARibbonBar(QMenuBar):
     def resizeInOfficeStyle(self):
         """按照Office风格重新定义尺寸"""
         self.updateRibbonElementGeometry()
-        x = RibbonSubElementStyleOpt.widgetBord.left()
-        y = RibbonSubElementStyleOpt.widgetBord.top()
-
-        titleH = self.titleBarHeight()
-        validTitleBarHeight = titleH - y
-        tabH = self.tabBarHeight()
-        x += self.m_d.iconRightBorderPosition + 5
-        connerL = self.cornerWidget(Qt.TopLeftCorner)
-        if connerL and connerL.isVisible():
-            connerSize = connerL.sizeHint()
-            if connerSize.height() < validTitleBarHeight:
-                detal = (validTitleBarHeight - connerSize.height()) / 2
-                connerL.setGeometry(x, y+detal, connerSize.width(), connerSize.height())
-            else:
-                connerL.setGeometry(x, y, connerSize.width(), validTitleBarHeight)
-            x = connerL.geometry().right() + 5
-        # quick access bar定位
-        if self.m_d.quickAccessBar and self.m_d.quickAccessBar.isVisible():
-            quickAccessBarSize = self.m_d.quickAccessBar.sizeHint()
-            self.m_d.quickAccessBar.setGeometry(x, y, quickAccessBarSize.width(), validTitleBarHeight)
-
-        # 第二行，开始布局applitionButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
-        x = RibbonSubElementStyleOpt.widgetBord.left()
-        y = titleH + RibbonSubElementStyleOpt.widgetBord.top()
-        if self.m_d.applitionButton and self.m_d.applitionButton.isVisible():
-            self.m_d.applitionButton.setGeometry(x, y, self.applitionButtonWidth(), tabH)
-            x = self.m_d.applitionButton.geometry().right()
-        # top right是一定要配置的，对于多文档窗口，子窗口的缩放等按钮就是通过这个窗口实现
-        endX = self.width() - RibbonSubElementStyleOpt.widgetBord.right()
-        connerR = self.cornerWidget(Qt.TopRightCorner)
-        if connerR and connerR.isVisible():
-            connerSize = connerR.sizeHint()
-            endX -= connerSize.width()
-            if connerSize.height() < tabH:
-                detal = (tabH - connerSize.height()) / 2
-                connerR.setGeometry(endX, y+detal, connerSize.width(), connerSize.height())
-            else:
-                connerR.setGeometry(endX, y, connerSize.width(), tabH)
-        # tabBar 右边的附加按钮组，这里一般会附加一些类似登录等按钮组
-        if self.m_d.tabBarRightSizeButtonGroupWidget and self.m_d.tabBarRightSizeButtonGroupWidget.isVisible():
-            wSize = self.m_d.tabBarRightSizeButtonGroupWidget.sizeHint()
-            endX -= wSize.width()
-            self.m_d.tabBarRightSizeButtonGroupWidget.setGeometry(endX, y, wSize.width(), tabH)
-        # 最后确定tabbar宽度
-        tabBarWidth = endX - x
-        self.m_d.ribbonTabBar.setGeometry(x, y, tabBarWidth, tabH)
-        # 调整整个stackedContainer
-        self.resizeStackedContainerWidget()
+        self._barLayout.setGeometry(self.rect())
 
     def resizeInWpsLiteStyle(self):
         """按照WPS风格重新定义尺寸"""
         self.updateRibbonElementGeometry()
-        x = RibbonSubElementStyleOpt.widgetBord.left()
-        y = RibbonSubElementStyleOpt.widgetBord.top()
-        titleH = self.titleBarHeight()
-        validTitleBarHeight = titleH - y
-        # WPS风格下applitionButton 先定位
-        if self.m_d.applitionButton and self.m_d.applitionButton.isVisible():
-            self.m_d.applitionButton.setGeometry(x, y, self.applitionButtonWidth(), titleH)
-            x = self.m_d.applitionButton.geometry().right() + 2
-
-        # applitionButton定位完后先布局右边内容
-        endX = self.width() - RibbonSubElementStyleOpt.widgetBord.right() - self.m_d.windowButtonSize.width()
-        connerR = self.cornerWidget(Qt.TopRightCorner)
-        if connerR and connerR.isVisible():
-            connerSize = connerR.sizeHint()
-            endX -= connerSize.width()
-            if connerSize.height() < validTitleBarHeight:
-                detal = (validTitleBarHeight - connerSize.height()) / 2
-                connerR.setGeometry(endX, y + detal, connerSize.width(), connerSize.height())
-            else:
-                connerR.setGeometry(endX, y, connerSize.width(), validTitleBarHeight)
-        # quickAccessBar定位右边邻接buttonGroup
-        if self.m_d.quickAccessBar and self.m_d.quickAccessBar.isVisible():
-            quickAccessBarSize = self.m_d.quickAccessBar.sizeHint()
-            endX -= quickAccessBarSize.width()
-            self.m_d.quickAccessBar.setGeometry(endX, y, quickAccessBarSize.width(), validTitleBarHeight)
-
-        connerL = self.cornerWidget(Qt.TopLeftCorner)
-        if connerL and connerL.isVisible():
-            connerSize = connerL.sizeHint()
-            endX -= connerSize.width()
-            if connerSize.height() < validTitleBarHeight:
-                detal = (validTitleBarHeight - connerSize.height()) / 2
-                connerL.setGeometry(endX, y + detal, connerSize.width(), connerSize.height())
-            else:
-                connerL.setGeometry(endX, y, connerSize.width(), validTitleBarHeight)
-
-        # 开始定位tabbar以及tabBarRightSizeButtonGroupWidget
-        # tab bar 定位 wps模式下applitionButton的右边就是tab bar, tabBar 右边的附加按钮组
-        if self.m_d.tabBarRightSizeButtonGroupWidget and self.m_d.tabBarRightSizeButtonGroupWidget.isVisible():
-            wSize = self.m_d.tabBarRightSizeButtonGroupWidget.sizeHint()
-            endX -= wSize.width()
-            self.m_d.tabBarRightSizeButtonGroupWidget.setGeometry(endX, y, wSize.width(), validTitleBarHeight)
-
-        # 计算tab所占用的宽度，最后确定tabbar宽度
-        tabBarWidth = min(endX - x, self.calcMinTabBarWidth())
-        tabH = min(self.tabBarHeight(), validTitleBarHeight)
-        # 如果tabH较小，则下以，让tab底部和title的底部对齐
-        y = y + validTitleBarHeight - tabH
-        self.m_d.ribbonTabBar.setGeometry(x, y, tabBarWidth, tabH)
-        # 调整整个stackedContainer
-        self.resizeStackedContainerWidget()
+        self._barLayout.setGeometry(self.rect())
 
     def paintInNormalStyle(self):
         """绘制Office Style背景"""
@@ -792,7 +832,7 @@ class SARibbonBar(QMenuBar):
                 contextTitleRect.setHeight(self.m_d.ribbonTabBar.height()-1)    # 减1像素，避免tabbar基线覆盖
                 contextTitleRect -= self.m_d.ribbonTabBar.tabMargin()
                 # 把区域顶部扩展到窗口顶部
-                contextTitleRect.setTop(RibbonSubElementStyleOpt.widgetBord.top())
+                contextTitleRect.setTop(RibbonSubElementStyleOpt.widgetBorder.top())
                 # 绘制
                 self.paintContextCategoryTab(p, ccd.contextCategory.contextTitle(), contextTitleRect, clr)
                 # 更新上下文标签的范围，用于控制标题栏的显示
@@ -816,31 +856,33 @@ class SARibbonBar(QMenuBar):
             titleRegion = QRect()
             if contextCategoryRegion.y() < 0:
                 titleRegion.setRect(
-                    self.m_d.quickAccessBar.geometry().right()+1,
-                    RibbonSubElementStyleOpt.widgetBord.top(),
-                    self.width()-self.m_d.iconRightBorderPosition-RibbonSubElementStyleOpt.widgetBord.right()
-                    - self.m_d.windowButtonSize.width()-self.m_d.quickAccessBar.geometry().right()-1,
-                    RibbonSubElementStyleOpt.titleBarHeight,
+                    int(self.m_d.quickAccessBar.geometry().right()+1),
+                    int(RibbonSubElementStyleOpt.widgetBorder.top()),
+                    int(self.width()-self.m_d.iconRightBorderPosition-RibbonSubElementStyleOpt.widgetBorder.right()
+                    - self.m_d.windowButtonSize.width()-self.m_d.quickAccessBar.geometry().right()-1),
+                    int(RibbonSubElementStyleOpt.titleBarHeight),
                 )
             else:
                 leftwidth = contextCategoryRegion.x() - self.m_d.quickAccessBar.geometry().right() - self.m_d.iconRightBorderPosition
                 rightwidth = self.width() - contextCategoryRegion.y() - self.m_d.windowButtonSize.width()
                 if rightwidth > leftwidth:  # 说明右边的区域大一点，标题显示在右
                     titleRegion.setRect(
-                        contextCategoryRegion.y(),
-                        RibbonSubElementStyleOpt.widgetBord.top(),
-                        rightwidth,
-                        RibbonSubElementStyleOpt.titleBarHeight,
+                        int(contextCategoryRegion.y()),
+                        int(RibbonSubElementStyleOpt.widgetBorder.top()),
+                        int(rightwidth),
+                        int(RibbonSubElementStyleOpt.titleBarHeight),
                     )
                 else:   # 说明左边的区域大一点，标题显示在右
                     titleRegion.setRect(
-                        self.m_d.iconRightBorderPosition+self.m_d.quickAccessBar.geometry().right(),
-                        RibbonSubElementStyleOpt.widgetBord.top(),
-                        leftwidth,
-                        RibbonSubElementStyleOpt.titleBarHeight,
+                        int(self.m_d.iconRightBorderPosition+self.m_d.quickAccessBar.geometry().right()),
+                        int(RibbonSubElementStyleOpt.widgetBorder.top()),
+                        int(leftwidth),
+                        int(RibbonSubElementStyleOpt.titleBarHeight),
                     )
-            self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
-            self.paintWindowIcon(p, parWindow.windowIcon())
+            if self.isTitleVisible():
+                self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
+            if self.isTitleIconVisible():
+                self.paintWindowIcon(p, parWindow.windowIcon())
 
     def paintInWpsLiteStyle(self):
         """绘制WPS Style背景"""
@@ -859,7 +901,7 @@ class SARibbonBar(QMenuBar):
                 contextTitleRect.setHeight(self.m_d.ribbonTabBar.height()-1)    # 减1像素，避免tabbar基线覆盖
                 contextTitleRect -= self.m_d.ribbonTabBar.tabMargin()
                 # 把区域顶部扩展到窗口顶部
-                contextTitleRect.setTop(RibbonSubElementStyleOpt.widgetBord.top())
+                contextTitleRect.setTop(RibbonSubElementStyleOpt.widgetBorder.top())
                 # 绘制
                 self.paintContextCategoryTab(p, '', contextTitleRect, clr)
 
@@ -878,27 +920,14 @@ class SARibbonBar(QMenuBar):
             start = self.m_d.ribbonTabBar.x() + self.m_d.ribbonTabBar.width()
             width = self.m_d.quickAccessBar.x() - start
             if width > 20:
-                titleRegion = QRect(start, RibbonSubElementStyleOpt.widgetBord.top(), width, RibbonSubElementStyleOpt.titleBarHeight)
-                self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
-                self.paintWindowIcon(p, parWindow.windowIcon())
+                titleRegion = QRect(int(start), int(RibbonSubElementStyleOpt.widgetBorder.top()), int(width), int(RibbonSubElementStyleOpt.titleBarHeight))
+                if self.isTitleVisible():
+                    self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
+                if self.isTitleIconVisible():
+                    self.paintWindowIcon(p, parWindow.windowIcon())
 
     def resizeStackedContainerWidget(self):
-        if self.m_d.stackedContainerWidget.isPopupMode():
-            # 弹出模式时，高度
-            absPosition = self.mapToGlobal(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), self.m_d.ribbonTabBar.geometry().bottom()+1))
-            self.m_d.stackedContainerWidget.setGeometry(
-                absPosition.x(),
-                absPosition.y(),
-                self.width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right(),
-                self.mainBarHeight()-self.m_d.ribbonTabBar.geometry().bottom()-RibbonSubElementStyleOpt.widgetBord.bottom()-1
-            )
-        else:
-            self.m_d.stackedContainerWidget.setGeometry(
-                RibbonSubElementStyleOpt.widgetBord.left(),
-                self.m_d.ribbonTabBar.geometry().bottom()+1,
-                self.width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right(),
-                self.mainBarHeight()-self.m_d.ribbonTabBar.geometry().bottom()-RibbonSubElementStyleOpt.widgetBord.bottom()-1
-            )
+        self._barLayout._layoutStackedContainer(self)
 
     def updateContextCategoryManagerData(self):
         """刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用"""
@@ -928,8 +957,8 @@ class SARibbonBar(QMenuBar):
         pen.setWidth(1)
         pen.setStyle(Qt.SolidLine)
         painter.setPen(pen)
-        painter.drawLine(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), lineY),
-                         QPoint(self.width()-RibbonSubElementStyleOpt.widgetBord.right()-1, lineY))
+        painter.drawLine(QPoint(RibbonSubElementStyleOpt.widgetBorder.left(), lineY),
+                         QPoint(self.width()-RibbonSubElementStyleOpt.widgetBorder.right()-1, lineY))
         painter.restore()
 
     def paintWindowTitle(self, painter: QPainter, title: str, titleRegion: QRect):
@@ -944,11 +973,11 @@ class SARibbonBar(QMenuBar):
         painter.save()
         if not icon.isNull():
             iconMinSize = RibbonSubElementStyleOpt.titleBarHeight - 6
-            icon.paint(painter, RibbonSubElementStyleOpt.widgetBord.left() + 3,
-                       RibbonSubElementStyleOpt.widgetBord.top() + 3, iconMinSize, iconMinSize)
-            self.m_d.iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBord.left()+iconMinSize
+            icon.paint(painter, int(RibbonSubElementStyleOpt.widgetBorder.left() + 3),
+                       int(RibbonSubElementStyleOpt.widgetBorder.top() + 3), int(iconMinSize), int(iconMinSize))
+            self.m_d.iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBorder.left()+iconMinSize
         else:
-            self.m_d.iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBord.left()
+            self.m_d.iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBorder.left()
         painter.restore()
 
     def paintContextCategoryTab(self, painter: QPainter, title: str, contextRect: QRect, color: QColor):
@@ -957,7 +986,7 @@ class SARibbonBar(QMenuBar):
         painter.save()
         painter.setPen(Qt.NoPen)
         painter.setBrush(color)
-        painter.drawRect(QRect(contextRect.x(), RibbonSubElementStyleOpt.widgetBord.top(), contextRect.width(), 5))
+        painter.drawRect(QRect(int(contextRect.x()), int(RibbonSubElementStyleOpt.widgetBorder.top()), int(contextRect.width()), 5))
 
         # 剩下把颜色变亮90%
         gColor = color.lighter(190)     # c++使用的light()已停用，使用ligher()代替
@@ -1000,7 +1029,7 @@ class SARibbonBar(QMenuBar):
         if not icon.isNull():
             iconMinSize = RibbonSubElementStyleOpt.titleBarHeight - 6
             s = icon.actualSize(QSize(iconMinSize, iconMinSize))
-            self.m_d.iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBord.left() + s.width()
+            self.m_d.iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBorder.left() + s.width()
         self.update()
 
     def onCategoryWindowTitleChanged(self, title: str):
@@ -1061,15 +1090,13 @@ class SARibbonBar(QMenuBar):
         # 调整stacked widget的顺序，调整顺序是为了调用categoryPages函数返回的QList<SARibbonCategory *>顺序和tabbar一致
         self.m_d.stackedContainerWidget.moveWidget(fr, to)
 
-    # 信号
-    applitionButtonClicked = pyqtSignal()       # 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
-    currentRibbonTabChanged = pyqtSignal(int)   # 标签页变化触发的信号
-
     # 枚举
     OfficeStyle = 0x0000            # 类似office 的ribbon风格
-    OfficeStyleTwoRow = 0x0100      # 类似office 的ribbon风格 2行工具栏 三行布局模式，默认模式
+    OfficeStyleTwoRow = 0x0100      # 类似office 的ribbon风格 2行工具栏
+    OfficeStyleSingleRow = 0x0200   # 类似office 的ribbon风格 单行工具栏
     WpsLiteStyle = 0x0001           # 类似wps的紧凑风格
     WpsLiteStyleTwoRow = 0x0101     # 类似wps的紧凑风格  2行工具栏
+    WpsLiteStyleSingleRow = 0x0201  # 类似wps的紧凑风格  单行工具栏
     MinimumRibbonMode = 0x0000
     NormalRibbonMode = 0x0001
 

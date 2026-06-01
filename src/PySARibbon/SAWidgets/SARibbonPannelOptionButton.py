@@ -9,10 +9,8 @@
 如果一定要重载此按钮，可以通过重载 SARibbonElementCreateDelegate
 的 SARibbonElementCreateDelegate.createRibbonPannelOptionButton来实现新的OptionButton
 """
-import PySARibbon.resource_rc
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QToolButton, QAction
+from .. import resource_rc
+from ..compat import QIcon, QSize, QToolButton, QAction
 
 
 class SARibbonPannelOptionButton(QToolButton):

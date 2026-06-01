@@ -3,8 +3,7 @@
 @Module     SARibbonTabBar
 @Author     ROOT
 """
-from PyQt5.QtCore import QMargins
-from PyQt5.QtWidgets import QTabBar
+from ..compat import QMargins, QTabBar
 
 
 class SARibbonTabBar(QTabBar):

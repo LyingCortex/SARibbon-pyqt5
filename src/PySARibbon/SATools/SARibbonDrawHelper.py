@@ -3,9 +3,7 @@
 @Module     SARibbonDrawHelper
 @Author     ROOT
 """
-from PyQt5.QtCore import Qt, QSize, QRect
-from PyQt5.QtGui import QPixmap, QIcon, QPainter
-from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle
+from ..compat import Qt, QSize, QRect, QPixmap, QIcon, QPainter, QWidget, QStyleOption, QStyle
 
 
 class SARibbonDrawHelper:
@@ -24,7 +22,9 @@ class SARibbonDrawHelper:
         if (opt.state & QStyle.State_Selected) or (opt.state & QStyle.State_On):
             state = QIcon.On
 
-        return icon.pixmap(widget.window().windowHandle(), icoSize, mode, state)
+        return icon.pixmap(widget.window().windowHandle(), icoSize, mode, state) \
+            if widget.window().windowHandle() \
+            else icon.pixmap(icoSize, mode, state)
 
     @staticmethod
     def drawIcon(icon: QIcon, painter: QPainter, opt: QStyleOption, *_args):
@@ -35,7 +35,7 @@ class SARibbonDrawHelper:
         if len(_args) < 1:
             return
         if isinstance(_args[0], int):
-            rect = QRect(_args[0], _args[1], _args[2], _args[3])
+            rect = QRect(int(_args[0]), int(_args[1]), int(_args[2]), int(_args[3]))
         else:
             rect = _args[0]
 
@@ -74,7 +74,7 @@ class SARibbonDrawHelper:
         if len(_args) < 1:
             return
         if isinstance(_args[0], int):
-            rect = QRect(_args[0], _args[1], _args[2], _args[3])
+            rect = QRect(int(_args[0]), int(_args[1]), int(_args[2]), int(_args[3]))
         else:
             rect = _args[0]
 

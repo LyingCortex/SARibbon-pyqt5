@@ -3,11 +3,9 @@
 @Module     SARibbonGallery
 @Author     ROOT
 """
-import PySARibbon.resource_rc
+from . import resource_rc
 from typing import List
-from PyQt5.QtCore import QSize, pyqtSignal, Qt, QPoint, QModelIndex
-from PyQt5.QtGui import QIcon, QResizeEvent
-from PyQt5.QtWidgets import QFrame, QActionGroup, QAction, QWidget, QVBoxLayout, QSizePolicy, QApplication
+from .compat import QSize, pyqtSignal, Qt, QPoint, QModelIndex, QIcon, QResizeEvent, QFrame, QActionGroup, QAction, QWidget, QVBoxLayout, QSizePolicy, QApplication
 
 from .SAWidgets.SARibbonGalleryGroup import SARibbonGalleryGroup, SARibbonGalleryGroupModel
 from .SAWidgets.SARibbonControlButton import SARibbonControlButton
@@ -31,6 +29,10 @@ class RibbonGalleryViewport(QWidget):
 
 
 class SARibbonGallery(QFrame):
+    # 信号
+    triggered = pyqtSignal(QAction)
+    hovered = pyqtSignal(QAction)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.buttonUp: SARibbonControlButton = SARibbonControlButton(self)
@@ -152,11 +154,11 @@ class SARibbonGallery(QFrame):
             vscrollBar.setValue(v)
 
     def onShowMoreDetail(self):
-        if self.popupWidget:
+        if not self.popupWidget:
             return
         popupMenuSize = self.popupWidget.minimumSizeHint()
         start = self.mapToGlobal(QPoint(0, 0))
-        self.popupWidget.setGeometry(start.x(), start.y(), self.width(), popupMenuSize.height())
+        self.popupWidget.setGeometry(int(start.x()), int(start.y()), int(self.width()), int(popupMenuSize.height()))
         self.popupWidget.show()
 
     def onItemClicked(self, index: QModelIndex):
@@ -182,16 +184,12 @@ class SARibbonGallery(QFrame):
         self.buttonMore.move(r.width() - self.buttonMore.width(), self.buttonDown.geometry().bottom())
         subW = max(subW, self.buttonMore.width())
         if self.viewportGroup:
-            self.viewportGroup.setGeometry(0, 0, r.width() - subW, r.height())
+            self.viewportGroup.setGeometry(0, 0, int(r.width() - subW), int(r.height()))
         super().resizeEvent(e)
-
-    # 信号
-    triggered = pyqtSignal(QAction)
-    hovered = pyqtSignal(QAction)
 
 
 if __name__ == '__main__':
-    from PyQt5.QtWidgets import QApplication
+    from .compat import QApplication
 
     app = QApplication([])
     mainWindow = QWidget()
