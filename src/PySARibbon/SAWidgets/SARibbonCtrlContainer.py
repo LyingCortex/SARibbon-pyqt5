@@ -4,8 +4,7 @@
 @Author     ROOT
 """
 from typing import Union
-from PyQt5.QtCore import Qt, QSize, QRect
-from PyQt5.QtWidgets import QWidget, QStyleOption, QSizePolicy, QStylePainter
+from ..compat import Qt, QSize, QRect, QWidget, QStyleOption, QSizePolicy, QStylePainter
 
 from ..SATools.SARibbonDrawHelper import SARibbonDrawHelper
 
@@ -13,18 +12,18 @@ from ..SATools.SARibbonDrawHelper import SARibbonDrawHelper
 class SARibbonCtrlContainer(QWidget):
     def __init__(self, container: Union[QWidget, None], parent):
         super().__init__(parent)
-        self.containerWidget: QWidget = container
+        self._containerWidget: QWidget = container
         self.enableDrawIcon = False
         self.enableDrawTitle = False
 
-        if self.containerWidget:
-            self.containerWidget.setParent(self)
+        if self._containerWidget:
+            self._containerWidget.setParent(self)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed))
 
     def sizeHint(self) -> QSize:
-        if not self.containerWidget:
+        if not self._containerWidget:
             return super().sizeHint()
-        sizeHint = self.containerWidget.sizeHint()
+        sizeHint = self._containerWidget.sizeHint()
         if self.enableDrawIcon:
             icon = self.windowIcon()
             if not icon.isNull():
@@ -37,9 +36,9 @@ class SARibbonCtrlContainer(QWidget):
         return sizeHint
 
     def minimumSizeHint(self) -> QSize:
-        if not self.containerWidget:
+        if not self._containerWidget:
             return super().minimumSizeHint()
-        sizeHint = self.containerWidget.minimumSizeHint()
+        sizeHint = self._containerWidget.minimumSizeHint()
         if self.enableDrawIcon:
             icon = self.windowIcon()
             if not icon.isNull():
@@ -52,7 +51,7 @@ class SARibbonCtrlContainer(QWidget):
         return sizeHint
 
     def containerWidget(self) -> QWidget:
-        return self.containerWidget
+        return self._containerWidget
 
     def setEnableShowIcon(self, b: bool):
         self.enableDrawIcon = b
@@ -63,13 +62,13 @@ class SARibbonCtrlContainer(QWidget):
         self.update()
 
     def setContainerWidget(self, container: QWidget):
-        if self.containerWidget:
-            self.containerWidget.hide()
-            self.containerWidget.deleteLater()
+        if self._containerWidget:
+            self._containerWidget.hide()
+            self._containerWidget.deleteLater()
         if not container:
             return
-        self.containerWidget = container
-        self.containerWidget.setParent(self)
+        self._containerWidget = container
+        self._containerWidget.setParent(self)
 
     def paintEvent(self, w):
         painter = QStylePainter(self)
@@ -96,7 +95,7 @@ class SARibbonCtrlContainer(QWidget):
                     SARibbonDrawHelper.drawText(
                         text, painter, opt,
                         Qt.AlignLeft | Qt.AlignVCenter,
-                        QRect(x, 0, textWidth, opt.rect.height())
+                        QRect(int(x), 0, int(textWidth), int(opt.rect.height()))
                     )
 
     def resizeEvent(self, e):
@@ -121,8 +120,8 @@ class SARibbonCtrlContainer(QWidget):
                 if textWidth > 0:
                     x += textWidth + 2
 
-        if self.containerWidget:
-            self.containerWidget.setGeometry(x, 0, self.width() - x, self.height())
+        if self._containerWidget:
+            self._containerWidget.setGeometry(int(x), 0, int(self.width() - x), int(self.height()))
 
     def initStyleOption(self, opt: QStyleOption):
         opt.initFrom(self)

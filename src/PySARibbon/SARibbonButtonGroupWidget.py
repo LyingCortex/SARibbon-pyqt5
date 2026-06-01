@@ -4,9 +4,7 @@
 @Author     ROOT
 """
 from typing import List, Union
-from PyQt5.QtCore import pyqtSignal, QSize, Qt, QEvent
-from PyQt5.QtGui import QActionEvent
-from PyQt5.QtWidgets import QFrame, QAction, QMenu, QToolButton, QWidget, QHBoxLayout, QSizePolicy, QWidgetAction
+from .compat import pyqtSignal, QSize, Qt, QEvent, QActionEvent, QFrame, QAction, QMenu, QToolButton, QWidget, QHBoxLayout, QSizePolicy, QWidgetAction
 
 from .SAWidgets.SARibbonToolButton import SARibbonToolButton
 from .SATools.SARibbonElementManager import RibbonSubElementDelegate
@@ -90,15 +88,16 @@ class SARibbonButtonGroupWidget(QFrame):
 
     def hideWidget(self, act: QAction):
         """隐藏指定Widget"""
-        i = len(self.mItems)
+        found = -1
         for i, it in enumerate(self.mItems):
             if isinstance(it.action, QWidgetAction) and it.action == act:
                 it.widget.hide()
                 widgetAction: QWidgetAction = it.action
                 widgetAction.releaseWidget(it.widget)
+                found = i
                 break
-        if i < len(self.mItems):
-            self.mItems.pop(i)
+        if found >= 0:
+            self.mItems.pop(found)
 
     def sizeHint(self) -> QSize:
         return self.layout().sizeHint()
@@ -142,14 +141,16 @@ class SARibbonButtonGroupWidget(QFrame):
             self.layout().invalidate()
         elif e.type() == QEvent.ActionRemoved:
             item.action.disconnect(self)
-            for it in self.mItems:
-                if isinstance(it.action, QWidgetAction) and it.customWidget:
-                    widgetAction: QWidgetAction = it.action
-                    widgetAction.releaseWidget(it.widget)
-                else:
-                    it.widget.hide()
-                    it.widget.deleteLater()
-            self.mItems.clear()
+            for i, it in enumerate(self.mItems):
+                if it.action == item.action:
+                    if isinstance(it.action, QWidgetAction) and it.customWidget:
+                        widgetAction: QWidgetAction = it.action
+                        widgetAction.releaseWidget(it.widget)
+                    else:
+                        it.widget.hide()
+                        it.widget.deleteLater()
+                    self.mItems.pop(i)
+                    break
             self.layout().invalidate()
 
     # 参考QToolBar.actionTriggered的信号

@@ -9,8 +9,7 @@
 """
 from typing import List
 
-from PyQt5.QtCore import QObject
-from PyQt5.QtWidgets import QWidget
+from ..compat import QObject, QWidget
 
 from PySARibbon.SAWidgets import SARibbonPannelItem
 from PySARibbon.SATools.SARibbonGlobal import SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE
@@ -138,7 +137,7 @@ class SARibbonCustomizeData(object):
             if not p:
                 return False
             pannelIdx = c.pannelIndex(p)
-            if p == -1:
+            if pannelIdx == -1:
                 return False
             c.movePannel(pannelIdx, pannelIdx + self.indexValue)
             return True
@@ -353,7 +352,7 @@ class SARibbonCustomizeData(object):
 
         willremoveIndex = list()    # 记录要删除的index
         # 首先针对连续出现的添加和删除操作进行优化
-        for i in range(size):
+        for i in range(1, size):
             if (csd[i-1].actionType() == cls.AddCategoryActionType and
                 csd[i].actionType() == cls.RemoveCategoryActionType):
                 if csd[i-1].categoryObjNameValue == csd[i].categoryObjNameValue:
@@ -377,7 +376,7 @@ class SARibbonCustomizeData(object):
 
         # 筛选VisibleCategoryActionType，对于连续出现的操作只保留最后一步
         size = len(res)
-        for i in range(size):
+        for i in range(1, size):
             if (res[i-1].actionType() == cls.VisibleCategoryActionType and
                  res[i].actionType() == cls.VisibleCategoryActionType):
                 # 要保证操作的是同一个内容
@@ -405,8 +404,8 @@ class SARibbonCustomizeData(object):
         willremoveIndex.clear()
 
         # 针对连续的ChangeCategoryOrderActionType，ChangePannelOrderActionType，ChangeActionOrderActionType进行合并
-        size = res.size()
-        for i in range(size):
+        size = len(res)
+        for i in range(1, size):
             if (res[i-1].actionType() == cls.ChangeCategoryOrderActionType and
                         res[i].actionType() == cls.ChangeCategoryOrderActionType):
                 if res[i-1].categoryObjNameValue == res[i].categoryObjNameValue:
@@ -432,9 +431,9 @@ class SARibbonCustomizeData(object):
 
         # 上一步操作可能会产生indexvalue为0的情况，此操作把indexvalue为0的删除
         for i, val in enumerate(res):
-            if (val.actionType() == cls.ChangeCategoryOrderActionType and
-                        val.actionType() == cls.ChangeCategoryOrderActionType or
-                        val.actionType() == cls.ChangeCategoryOrderActionType):
+            if (val.actionType() == cls.ChangeCategoryOrderActionType or
+                        val.actionType() == cls.ChangePannelOrderActionType or
+                        val.actionType() == cls.ChangeActionOrderActionType):
                 if val.indexValue == 0:
                     willremoveIndex.append(i)
         res = cls.remove_indexs(res, willremoveIndex)

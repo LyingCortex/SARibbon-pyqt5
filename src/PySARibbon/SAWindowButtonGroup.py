@@ -5,9 +5,7 @@
 
 @brief 窗口的最大最小化按钮
 """
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtCore import QEvent
-from PyQt5.QtWidgets import QWidget, QToolButton, QStyle
+from .compat import Qt, QSize, QEvent, QWidget, QToolButton, QStyle
 
 
 class SAWindowToolButton(QToolButton):
@@ -203,18 +201,21 @@ class SAWindowButtonGroup(QWidget):
         if self.buttonMinimize:
             tw += self.mMinStretch
 
+        if tw == 0:
+            return
+
         x = 0
         if self.buttonMinimize:
             w = (self.mMinStretch / tw) * size.width()
-            self.buttonMinimize.setGeometry(x, 0, w, size.height())
+            self.buttonMinimize.setGeometry(int(x), 0, int(w), int(size.height()))
             x += w
         if self.buttonMaximize:
             w = (self.mMaxStretch / tw) * size.width()
-            self.buttonMaximize.setGeometry(x, 0, w, size.height())
+            self.buttonMaximize.setGeometry(int(x), 0, int(w), int(size.height()))
             x += w
         if self.buttonClose:
             w = (self.mCloseStretch / tw) * size.width()
-            self.buttonClose.setGeometry(x, 0, w, size.height())
+            self.buttonClose.setGeometry(int(x), 0, int(w), int(size.height()))
 
     def sizeHint(self) -> QSize:
         w = 0

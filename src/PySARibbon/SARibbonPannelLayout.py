@@ -9,8 +9,7 @@ SARibbonPannelLayout实际是一个列布局，每一列有2~3行，看窗口定
 核心函数：SARibbonPannelLayout.createItem
 """
 from typing import List, Union
-from PyQt5.QtCore import QRect, QSize, Qt
-from PyQt5.QtWidgets import QLayout, QAction, QLayoutItem, QWidget, QWidgetAction, QSizePolicy
+from .compat import QRect, QSize, Qt, QLayout, QAction, QLayoutItem, QWidget, QWidgetAction, QSizePolicy
 
 from .SAWidgets.SARibbonPannelItem import SARibbonPannelItem
 from .SAWidgets.SARibbonSeparatorWidget import SARibbonSeparatorWidget
@@ -110,7 +109,7 @@ class SARibbonPannelLayout(QLayout):
         return len(self.m_items)
 
     def isEmpty(self) -> bool:
-        return bool(self.m_items)
+        return not bool(self.m_items)
 
     def invalidate(self):
         self.m_dirty = True
@@ -159,7 +158,7 @@ class SARibbonPannelLayout(QLayout):
             return high
         if pannel.pannelLayoutMode() == SARibbonPannelLayout.ThreeRowMode:
             high = G_HIGHER_MODE_HEIGHT
-        elif pannel.pannelLayoutMode() == SARibbonPannelLayout.ThreeRowMode:
+        elif pannel.pannelLayoutMode() == SARibbonPannelLayout.TwoRowMode:
             high = G_LOWER_MODE_HEIGHT
         return high
 
@@ -287,7 +286,7 @@ class SARibbonPannelLayout(QLayout):
                     column += 1
                 item.rowIndex = 0
                 item.columnIndex = column
-                item.itemWillSetGeometry = QRect(x, magin.top(), hint.width(), largeH)
+                item.itemWillSetGeometry = QRect(int(x), int(magin.top()), int(hint.width()), int(largeH))
                 # 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
                 x += hint.width() + spacing
                 row = 0
@@ -302,12 +301,12 @@ class SARibbonPannelLayout(QLayout):
                 item.rowIndex = row
                 item.columnIndex = column
                 if row == 0:
-                    item.itemWillSetGeometry = QRect(x, medy0, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(medy0), int(hint.width()), int(smallH))
                     row = 1
                     columMaxWidth = hint.width()
                     lastRow0RP = SARibbonPannelItem.RPMedium
                 else:
-                    item.itemWillSetGeometry = QRect(x, medy1, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(medy1), int(hint.width()), int(smallH))
                     # 换列
                     x += max(columMaxWidth, hint.width()) + spacing
                     row = 0
@@ -317,14 +316,14 @@ class SARibbonPannelLayout(QLayout):
                 item.rowIndex = row
                 item.columnIndex = column
                 if row == 0:
-                    item.itemWillSetGeometry = QRect(x, smly0, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(smly0), int(hint.width()), int(smallH))
                     columMaxWidth = hint.width()
                     row = 1
                     lastRow0RP = SARibbonPannelItem.RPSmall
                 elif row == 1:
                     # 若第一行是Medium，按Medium排列
                     y1 = medy1 if lastRow0RP == SARibbonPannelItem.RPMedium else smly1
-                    item.itemWillSetGeometry = QRect(x, y1, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(y1), int(hint.width()), int(smallH))
                     if 2 == rowCount or lastRow0RP == SARibbonPannelItem.RPMedium:
                         x += max(columMaxWidth, hint.width()) + spacing
                         row = 0
@@ -334,7 +333,7 @@ class SARibbonPannelLayout(QLayout):
                         row = 2
                         columMaxWidth = max(columMaxWidth, hint.width())
                 else:
-                    item.itemWillSetGeometry = QRect(x, smly2, hint.width(), smallH)
+                    item.itemWillSetGeometry = QRect(int(x), int(smly2), int(hint.width()), int(smallH))
                     # 换列
                     x += max(columMaxWidth, hint.width()) + spacing
                     row = 0
@@ -385,12 +384,13 @@ class SARibbonPannelLayout(QLayout):
             return
 
         oneColCanexpandWidth = expandwidth / len(columnExpandInfo)
-        for key, value in columnExpandInfo.items():
+        for key in list(columnExpandInfo.keys()):
+            value = columnExpandInfo[key]
             oldColumnWidth, columnMaximumWidth = self.columnWidthInfo(key, value['oldColumnWidth'], value['columnMaximumWidth'])
             value['oldColumnWidth'] = oldColumnWidth
             value['columnMaximumWidth'] = columnMaximumWidth
             if oldColumnWidth < 0 or oldColumnWidth > columnMaximumWidth:
-                columnExpandInfo.pop(key)
+                del columnExpandInfo[key]
                 continue
             # 开始调整
             colwidth = oneColCanexpandWidth + oldColumnWidth

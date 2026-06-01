@@ -4,9 +4,7 @@
 @Author     ROOT
 """
 # from typing import Dict
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QObject, QPoint, QRect, QEvent
-from PyQt5.QtWidgets import QWidget, QRubberBand
+from .compat import Qt, QObject, QPoint, QRect, QEvent, QWidget, QRubberBand, mouseEventGlobalPos, mouseEventPos
 
 
 class CursorPosCalculator:
@@ -96,7 +94,6 @@ class WidgetData:
         if etype in edict:
             return edict[etype](event)
 
-        print('Unknow Event Type: %s' % etype)
         return False
 
     def updateRubberBandStatus(self):
@@ -194,11 +191,11 @@ class WidgetData:
     def handleMousePressEvent(self, event) -> bool:
         if event.button() == Qt.LeftButton:
             self.m_bLeftButtonPressed = True
-            self.m_bLeftButtonTitlePressed = (event.pos().y() < self.m_moveMousePos.m_nTitleHeight)
+            self.m_bLeftButtonTitlePressed = (mouseEventPos(event).y() < self.m_moveMousePos.m_nTitleHeight)
 
             frameRect = self.m_pWidget.frameGeometry()
-            self.m_pressedMousePos.recalculate(event.globalPos(), frameRect)
-            self.m_ptDragPos = event.globalPos() - frameRect.topLeft()
+            self.m_pressedMousePos.recalculate(mouseEventGlobalPos(event), frameRect)
+            self.m_ptDragPos = mouseEventGlobalPos(event) - frameRect.topLeft()
 
             if self.m_pressedMousePos.m_bOnEdges:
                 # 窗口在最大化状态时，点击标题栏不做任何处理
@@ -236,28 +233,28 @@ class WidgetData:
                 if self.m_pWidget.isMaximized():
                     # 窗口在最大化状态时，点击边界不做任何处理
                     return False
-                self.resizeWidget(event.globalPos())
+                self.resizeWidget(mouseEventGlobalPos(event))
                 return True
             elif self.obj.m_bWidgetMovable and self.m_bLeftButtonTitlePressed:
                 if self.m_pWidget.isMaximized():
                     # 先求出窗口到鼠标的相对位置
                     normalGeometry = self.m_pWidget.normalGeometry()
                     self.m_pWidget.showNormal()
-                    # p = event.globalPos()
-                    ry = event.globalY()
-                    rx = event.globalX()
+                    # p = mouseEventGlobalPos(event)
+                    ry = mouseEventGlobalPos(event).y()
+                    rx = mouseEventGlobalPos(event).x()
                     ry -= 10
                     rx -= (normalGeometry.width() / 2)
-                    self.m_pWidget.move(rx, ry)
+                    self.m_pWidget.move(int(rx), int(ry))
                     # 这时要重置m_ptDragPos
-                    self.m_ptDragPos = QPoint(normalGeometry.width()/2, 10)
+                    self.m_ptDragPos = QPoint(int(normalGeometry.width()/2), 10)
                     return True
 
-                self.moveWidget(event.globalPos())
+                self.moveWidget(mouseEventGlobalPos(event))
                 return True
             return False
         elif self.obj.m_bWidgetResizable:
-            self.updateCursorShape(event.globalPos())
+            self.updateCursorShape(mouseEventGlobalPos(event))
 
         return False
 
@@ -269,14 +266,14 @@ class WidgetData:
 
     def handleHoverMoveEvent(self, event) -> bool:
         if self.obj.m_bWidgetResizable:
-            self.updateCursorShape(self.m_pWidget.mapToGlobal(event.pos()))
+            self.updateCursorShape(self.m_pWidget.mapToGlobal(mouseEventPos(event)))
         return False
 
     def handleDoubleClickedMouseEvent(self, event) -> bool:
         if event.button() == Qt.LeftButton:
             if self.m_pWidget and (self.m_pWidget.windowButtonFlags() & Qt.WindowMaximizeButtonHint):
                 # 在最大化按钮显示时才进行shownormal处理
-                if event.pos().y() < self.m_moveMousePos.m_nTitleHeight:
+                if mouseEventPos(event).y() < self.m_moveMousePos.m_nTitleHeight:
                     if self.m_pWidget.isMaximized():
                         self.m_pWidget.showNormal()
                     else:
@@ -399,7 +396,7 @@ class SAFramelessHelper(QObject):
 
 
 if __name__ == '__main__':
-    from PyQt5.QtWidgets import QApplication
+    from .compat import QApplication
 
     app = QApplication([])
     mainWindow = QWidget()

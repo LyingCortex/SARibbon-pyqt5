@@ -5,15 +5,14 @@
 
 @brief 有qdialog功能的stackwidget，用于在最小化时stack能像dialog那样弹出来
 """
-from PyQt5.QtCore import pyqtSignal, QEventLoop, Qt
-from PyQt5.QtWidgets import QStackedWidget, QFrame
+from ..compat import pyqtSignal, QEventLoop, Qt, QStackedWidget, QFrame
 
 
 class SARibbonStackedWidget(QStackedWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.eventLoop: QEventLoop = None
-        self.isAutoResize = True
+        self._isAutoResize = True
 
     def setPopupMode(self):
         self.setMouseTracking(True)
@@ -21,7 +20,7 @@ class SARibbonStackedWidget(QStackedWidget):
         self.setFrameShape(QFrame.Panel)
 
     def isPopupMode(self) -> bool:
-        return self.windowFlags() & Qt.Popup
+        return bool(self.windowFlags() & Qt.Popup)
 
     def setNormalMode(self):
         if self.eventLoop:
@@ -45,10 +44,10 @@ class SARibbonStackedWidget(QStackedWidget):
         self.eventLoop = None
 
     def setAutoResize(self, autoresize: bool):
-        self.isAutoResize = autoresize
+        self._isAutoResize = autoresize
 
     def isAutoResize(self) -> bool:
-        return self.isAutoResize
+        return self._isAutoResize
 
     def moveWidget(self, fr: int, to: int):
         """
@@ -67,7 +66,7 @@ class SARibbonStackedWidget(QStackedWidget):
         super().hideEvent(e)
 
     def resizeEvent(self, e):
-        if self.isAutoResize:
+        if self._isAutoResize:
             for i in range(self.count()):
                 w = self.widget(i)
                 if w:
