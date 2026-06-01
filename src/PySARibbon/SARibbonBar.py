@@ -546,6 +546,91 @@ class SARibbonBar(QMenuBar):
         """快速响应栏"""
         return self.m_d.quickAccessBar
 
+    # --- 新增 API（对齐 C++ v2.8.0）---
+
+    def setTabBarHeight(self, h: int):
+        """设置 tabbar 高度"""
+        RibbonSubElementStyleOpt.tabBarHeight = h
+        self.updateRibbonElementGeometry()
+
+    def setTitleBarHeight(self, h: int):
+        """设置标题栏高度"""
+        RibbonSubElementStyleOpt.titleBarHeight = h
+        self.updateRibbonElementGeometry()
+
+    def setWindowTitleTextColor(self, color):
+        """设置标题文字颜色"""
+        RibbonSubElementStyleOpt.titleTextColor = color
+        self.update()
+
+    def windowTitleTextColor(self):
+        return RibbonSubElementStyleOpt.titleTextColor
+
+    def setTabBarBaseLineColor(self, color):
+        """设置 tabbar 底线颜色"""
+        RibbonSubElementStyleOpt.tabBarBaseLineColor = color
+        self.update()
+
+    def tabBarBaseLineColor(self):
+        return RibbonSubElementStyleOpt.tabBarBaseLineColor
+
+    def setContextCategoryColorList(self, colors: list):
+        """设置上下文标签的颜色列表"""
+        self.m_d.mContextCategoryColorList = colors
+        self.m_d.mContextCategoryColorListIndex = -1
+
+    def setCategoriesVisible(self, categories: list, visible: bool):
+        """批量设置 category 的显示/隐藏"""
+        for c in categories:
+            if visible:
+                self.showCategory(c)
+            else:
+                self.hideCategory(c)
+
+    def setEnableShowPanelTitle(self, enable: bool):
+        """设置是否显示 Panel 标题"""
+        categorys = self.categoryPages()
+        for c in categorys:
+            for p in c.pannelList():
+                p.setEnableShowTitle(enable)
+
+    def isEnableShowPanelTitle(self) -> bool:
+        """判断是否显示 Panel 标题（取第一个 panel 的状态）"""
+        categorys = self.categoryPages()
+        for c in categorys:
+            panels = c.pannelList()
+            if panels:
+                return panels[0].isEnableShowTitle()
+        return True
+
+    def setTitleVisible(self, visible: bool):
+        """设置标题是否可见"""
+        self.m_d._titleVisible = visible
+        self.update()
+
+    def isTitleVisible(self) -> bool:
+        return getattr(self.m_d, '_titleVisible', True)
+
+    def setTitleIconVisible(self, visible: bool):
+        """设置标题图标是否可见"""
+        self.m_d._titleIconVisible = visible
+        self.update()
+
+    def isTitleIconVisible(self) -> bool:
+        return getattr(self.m_d, '_titleIconVisible', True)
+
+    def isLooseStyle(self) -> bool:
+        """判断是否为宽松风格（等同 isOfficeStyle）"""
+        return self.isOfficeStyle()
+
+    def isCompactStyle(self) -> bool:
+        """判断是否为紧凑风格（等同非 Office 风格）"""
+        return not self.isOfficeStyle()
+
+    def isThreeRowStyle(self) -> bool:
+        """判断是否为三行模式"""
+        return not self.isTwoRowStyle() and not self.isSingleRowStyle()
+
     def setRibbonStyle(self, style):
         """设置ribbonbar的风格，此函数会重新设置所有元素"""
         self.m_d.ribbonStyle = style
@@ -766,8 +851,10 @@ class SARibbonBar(QMenuBar):
                         int(leftwidth),
                         int(RibbonSubElementStyleOpt.titleBarHeight),
                     )
-            self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
-            self.paintWindowIcon(p, parWindow.windowIcon())
+            if self.isTitleVisible():
+                self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
+            if self.isTitleIconVisible():
+                self.paintWindowIcon(p, parWindow.windowIcon())
 
     def paintInWpsLiteStyle(self):
         """绘制WPS Style背景"""
@@ -806,8 +893,10 @@ class SARibbonBar(QMenuBar):
             width = self.m_d.quickAccessBar.x() - start
             if width > 20:
                 titleRegion = QRect(int(start), int(RibbonSubElementStyleOpt.widgetBorder.top()), int(width), int(RibbonSubElementStyleOpt.titleBarHeight))
-                self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
-                self.paintWindowIcon(p, parWindow.windowIcon())
+                if self.isTitleVisible():
+                    self.paintWindowTitle(p, parWindow.windowTitle(), titleRegion)
+                if self.isTitleIconVisible():
+                    self.paintWindowIcon(p, parWindow.windowIcon())
 
     def resizeStackedContainerWidget(self):
         self._barLayout._layoutStackedContainer(self)

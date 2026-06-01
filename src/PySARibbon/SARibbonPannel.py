@@ -47,6 +47,7 @@ class SARibbonPannel(QWidget):
         self.m_optionActionButton: SARibbonPannelOptionButton = None
         self.m_layout: SARibbonPannelLayout = None
         self.m_isCanCustomize = True
+        self._enableShowTitle = True
 
         self.createLayout()
         self.setPannelLayoutMode(SARibbonPannel.ThreeRowMode)
@@ -236,10 +237,23 @@ class SARibbonPannel(QWidget):
         return sp.horizontalPolicy() == QSizePolicy.Expanding
 
     def titleHeight(self) -> int:
-        """标题栏高度，仅在三行模式下生效"""
+        """标题栏高度，仅在三行模式且启用标题时生效"""
+        if not self._enableShowTitle:
+            return 0
         if self.pannelLayoutMode() == SARibbonPannel.ThreeRowMode:
             return 21
         return 0
+
+    def setEnableShowTitle(self, enable: bool):
+        """设置是否显示 Panel 标题"""
+        if self._enableShowTitle == enable:
+            return
+        self._enableShowTitle = enable
+        self.updateGeometry()
+        self.repaint()
+
+    def isEnableShowTitle(self) -> bool:
+        return self._enableShowTitle
 
     def actionIndex(self, act: QAction):
         """action对应的布局index，此操作一般用于移动，其他意义不大"""
