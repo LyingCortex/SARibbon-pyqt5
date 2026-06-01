@@ -29,6 +29,10 @@ class RibbonGalleryViewport(QWidget):
 
 
 class SARibbonGallery(QFrame):
+    # 信号
+    triggered = pyqtSignal(QAction)
+    hovered = pyqtSignal(QAction)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.buttonUp: SARibbonControlButton = SARibbonControlButton(self)
@@ -182,10 +186,6 @@ class SARibbonGallery(QFrame):
         if self.viewportGroup:
             self.viewportGroup.setGeometry(0, 0, int(r.width() - subW), int(r.height()))
         super().resizeEvent(e)
-
-    # 信号
-    triggered = pyqtSignal(QAction)
-    hovered = pyqtSignal(QAction)
 
 
 if __name__ == '__main__':

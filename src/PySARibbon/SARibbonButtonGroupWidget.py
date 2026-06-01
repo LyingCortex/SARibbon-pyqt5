@@ -40,6 +40,9 @@ class SARibbonButtonGroupWidgetItem:
 
 
 class SARibbonButtonGroupWidget(QFrame):
+    # 参考QToolBar.actionTriggered的信号
+    actionTriggered = pyqtSignal(QAction)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.mItems: List[SARibbonButtonGroupWidgetItem] = list()
@@ -152,6 +155,3 @@ class SARibbonButtonGroupWidget(QFrame):
                     self.mItems.pop(i)
                     break
             self.layout().invalidate()
-
-    # 参考QToolBar.actionTriggered的信号
-    actionTriggered = pyqtSignal(QAction)

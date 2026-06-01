@@ -16,6 +16,8 @@ from .SARibbonPannel import SARibbonPannel
 
 
 class SARibbonCategory(QWidget):
+    """Ribbon标签页，承载多个SARibbonPannel"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self._defaultPannelLayoutMode = SARibbonPannel.ThreeRowMode

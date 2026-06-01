@@ -23,6 +23,8 @@ class SARibbonCategoryLayoutItem(QWidgetItem):
 
 
 class SARibbonCategoryLayout(QLayout):
+    """SARibbonCategory的布局管理器，负责pannel的水平排列和滚动"""
+
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self._items: List[SARibbonCategoryLayoutItem] = []

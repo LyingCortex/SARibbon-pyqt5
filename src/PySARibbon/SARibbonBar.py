@@ -172,6 +172,10 @@ class SARibbonBarPrivate:
 
 
 class SARibbonBar(QMenuBar):
+    # 信号
+    applicationButtonClicked = pyqtSignal()       # 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+    currentRibbonTabChanged = pyqtSignal(int)   # 标签页变化触发的信号
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self._barLayout = SARibbonBarLayout(self)
@@ -1085,10 +1089,6 @@ class SARibbonBar(QMenuBar):
     def onTabMoved(self, fr: int, to: int):
         # 调整stacked widget的顺序，调整顺序是为了调用categoryPages函数返回的QList<SARibbonCategory *>顺序和tabbar一致
         self.m_d.stackedContainerWidget.moveWidget(fr, to)
-
-    # 信号
-    applicationButtonClicked = pyqtSignal()       # 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
-    currentRibbonTabChanged = pyqtSignal(int)   # 标签页变化触发的信号
 
     # 枚举
     OfficeStyle = 0x0000            # 类似office 的ribbon风格

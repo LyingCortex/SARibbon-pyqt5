@@ -9,6 +9,9 @@ from ..compat import pyqtSignal, QEventLoop, Qt, QStackedWidget, QFrame
 
 
 class SARibbonStackedWidget(QStackedWidget):
+    # 信号
+    hidWindow = pyqtSignal()
+
     def __init__(self, parent):
         super().__init__(parent)
         self.eventLoop: QEventLoop = None
@@ -72,6 +75,3 @@ class SARibbonStackedWidget(QStackedWidget):
                 if w:
                     w.resize(e.size())
         return super().resizeEvent(e)
-
-    # 信号
-    hidWindow = pyqtSignal()

@@ -13,6 +13,8 @@ from .SATools.SARibbonElementManager import RibbonSubElementStyleOpt
 
 
 class SARibbonBarLayout(QLayout):
+    """SARibbonBar的布局管理器，负责定位各子控件"""
+
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self._dirty = True

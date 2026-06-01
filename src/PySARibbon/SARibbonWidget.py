@@ -19,6 +19,8 @@ from .SARibbonBar import SARibbonBar
 
 
 class SARibbonWidget(QWidget):
+    """带SARibbonBar的独立Widget，可嵌入任意容器"""
+
     NormalTheme = 0
     Office2013 = 1
 

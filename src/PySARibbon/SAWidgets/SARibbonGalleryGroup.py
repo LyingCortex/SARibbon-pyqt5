@@ -198,6 +198,9 @@ class SARibbonGalleryGroupModel(QAbstractListModel):
 
 
 class SARibbonGalleryGroup(QListView):
+    # 信号
+    groupTitleChanged = pyqtSignal(str)
+
     def __init__(self, parent):
         super().__init__(parent)
         self.enableIconText_ = False
@@ -288,9 +291,6 @@ class SARibbonGalleryGroup(QListView):
         act = item.action()
         if act:
             act.activate(QAction.Trigger)
-
-    # 信号
-    groupTitleChanged = pyqtSignal(str)
 
     # 枚举
     LargeIconWithText = 0
