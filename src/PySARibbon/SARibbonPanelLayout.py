@@ -414,12 +414,12 @@ class SARibbonPanelLayout(QLayout):
                     continue
                 if item.columnIndex == key:     # 此列的扩展
                     if item in value['expandItems']:
-                        item.itemWillSetGeometry.setWidth(value['columnExpandedWidth'])
+                        item.itemWillSetGeometry.setWidth(int(value['columnExpandedWidth']))
                     else:
                         continue
                 else:
                     # 后面item的往左移动
-                    item.itemWillSetGeometry.moveLeft(item.itemWillSetGeometry.x()+moveXLen)
+                    item.itemWillSetGeometry.moveLeft(int(item.itemWillSetGeometry.x()+moveXLen))
 
     def columnWidthInfo(self, colindex: int, width: int, maximum: int) -> (int, int):
         rwidth = width
