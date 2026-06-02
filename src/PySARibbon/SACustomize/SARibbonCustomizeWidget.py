@@ -402,10 +402,10 @@ class SARibbonCustomizeWidget(QWidget):
             return
 
         level: int = self.itemLevel(item)
-        self.ui.pushButtonAdd.setEnabled(self.selectedAction() and (level > 0) and self.isItemCanCustomize(item))
-        self.ui.pushButtonDelete.setEnabled(self.isItemCanCustomize(item))  # 有CustomizeRole，必有CanCustomizeRole
+        self.ui.pushButtonAdd.setEnabled(bool(self.selectedAction() and (level > 0) and self.isItemCanCustomize(item)))
+        self.ui.pushButtonDelete.setEnabled(bool(self.isItemCanCustomize(item)))
         self.ui.pushButtonRename.setEnabled(
-            level != 2 or self.isItemCanCustomize(item))  # QAction 不能改名 ， 有CustomizeRole，必有CanCustomizeRole
+            bool(level != 2 or self.isItemCanCustomize(item)))
 
     def onToolButtonUpClicked(self):
         item: QStandardItem = self.selectedItem()
@@ -966,7 +966,6 @@ class SARibbonCustomizeWidgetPrivate:
     def isItemCanCustomize(self, item: QStandardItem) -> bool:
         """判断是否可以自定义"""
         if not item:
-            print('warning: isItemCanCustomize, not item')
             return False
 
         v = item.data(SARibbonCustomizeWidget.CanCustomizeRole)
