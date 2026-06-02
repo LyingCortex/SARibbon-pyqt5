@@ -135,6 +135,7 @@ if PYQT_VERSION == 6:
     Qt.WA_LayoutUsesWidgetRect = Qt.WidgetAttribute.WA_LayoutUsesWidgetRect
 
     Qt.TextShowMnemonic = Qt.TextFlag.TextShowMnemonic
+    Qt.TextWordWrap = Qt.TextFlag.TextWordWrap
     Qt.ElideRight = Qt.TextElideMode.ElideRight
 
     Qt.CaseInsensitive = Qt.CaseSensitivity.CaseInsensitive
@@ -161,6 +162,7 @@ if PYQT_VERSION == 6:
     Qt.ToolButtonTextUnderIcon = Qt.ToolButtonStyle.ToolButtonTextUnderIcon
     Qt.ToolButtonTextBesideIcon = Qt.ToolButtonStyle.ToolButtonTextBesideIcon
     Qt.ToolButtonIconOnly = Qt.ToolButtonStyle.ToolButtonIconOnly
+    Qt.ToolButtonTextOnly = Qt.ToolButtonStyle.ToolButtonTextOnly
 
     # QEvent shortcuts
     QEvent.MouseButtonPress = QEvent.Type.MouseButtonPress
@@ -211,9 +213,22 @@ if PYQT_VERSION == 6:
     QStyle.State_AutoRaise = QStyle.StateFlag.State_AutoRaise
     QStyle.State_Selected = QStyle.StateFlag.State_Selected
     QStyle.State_On = QStyle.StateFlag.State_On
+    QStyle.State_Sunken = QStyle.StateFlag.State_Sunken
+    QStyle.State_Raised = QStyle.StateFlag.State_Raised
+    QStyle.State_Off = QStyle.StateFlag.State_Off
+    QStyle.State_HasFocus = QStyle.StateFlag.State_HasFocus
     QStyle.PE_PanelButtonTool = QStyle.PrimitiveElement.PE_PanelButtonTool
+    QStyle.PE_PanelButtonBevel = QStyle.PrimitiveElement.PE_PanelButtonBevel
     QStyle.PE_IndicatorArrowDown = QStyle.PrimitiveElement.PE_IndicatorArrowDown
+    QStyle.PE_IndicatorArrowUp = QStyle.PrimitiveElement.PE_IndicatorArrowUp
+    QStyle.PE_IndicatorArrowLeft = QStyle.PrimitiveElement.PE_IndicatorArrowLeft
+    QStyle.PE_IndicatorArrowRight = QStyle.PrimitiveElement.PE_IndicatorArrowRight
     QStyle.PE_PanelItemViewItem = QStyle.PrimitiveElement.PE_PanelItemViewItem
+    QStyle.SC_ToolButton = QStyle.SubControl.SC_ToolButton
+    QStyle.SC_ToolButtonMenu = QStyle.SubControl.SC_ToolButtonMenu
+    QStyle.PM_ButtonShiftHorizontal = QStyle.PixelMetric.PM_ButtonShiftHorizontal
+    QStyle.PM_ButtonShiftVertical = QStyle.PixelMetric.PM_ButtonShiftVertical
+    QStyle.SH_UnderlineShortcut = QStyle.StyleHint.SH_UnderlineShortcut
 
     # QIcon shortcuts
     QIcon.Normal = QIcon.Mode.Normal
@@ -225,6 +240,8 @@ if PYQT_VERSION == 6:
     # QPalette shortcuts
     QPalette.Window = QPalette.ColorRole.Window
     QPalette.Background = QPalette.ColorRole.Window  # deprecated alias
+    QPalette.ButtonText = QPalette.ColorRole.ButtonText
+    QPalette.HighlightedText = QPalette.ColorRole.HighlightedText
 
     # QListView shortcuts
     QListView.IconMode = QListView.ViewMode.IconMode
@@ -240,6 +257,8 @@ if PYQT_VERSION == 6:
     # QStyleOptionToolButton
     QStyleOptionToolButton.Menu = QStyleOptionToolButton.ToolButtonFeature.Menu
     QStyleOptionToolButton.HasMenu = QStyleOptionToolButton.ToolButtonFeature.HasMenu
+    QStyleOptionToolButton.MenuButtonPopup = QStyleOptionToolButton.ToolButtonFeature.MenuButtonPopup
+    QStyleOptionToolButton.Arrow = QStyleOptionToolButton.ToolButtonFeature.Arrow
 
     # QIODevice
     QIODevice.ReadOnly = QIODevice.OpenModeFlag.ReadOnly
