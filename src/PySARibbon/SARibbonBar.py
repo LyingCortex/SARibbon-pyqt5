@@ -163,7 +163,11 @@ class SARibbonBarPrivate:
         self.stackedContainerWidget.setNormalMode()
         self.stackedContainerWidget.setFocus()
         self.stackedContainerWidget.show()
+        # 必须在show之后设fixedHeight，否则show会触发resize覆盖高度
+        from .SATools.SARibbonElementManager import RibbonSubElementStyleOpt
         self.mainClass.setFixedHeight(self.mainClass.mainBarHeight())
+        # 强制重新布局
+        self.mainClass._barLayout.setGeometry(self.mainClass.rect())
 
     def getContextCategoryColor(self) -> QColor:
         if not self.mContextCategoryColorList:
@@ -812,12 +816,14 @@ class SARibbonBar(QMenuBar):
     def resizeInOfficeStyle(self):
         """按照Office风格重新定义尺寸"""
         self.updateRibbonElementGeometry()
-        self._barLayout.setGeometry(self.rect())
+        if not self.isMinimumMode():
+            self._barLayout.setGeometry(self.rect())
 
     def resizeInWpsLiteStyle(self):
         """按照WPS风格重新定义尺寸"""
         self.updateRibbonElementGeometry()
-        self._barLayout.setGeometry(self.rect())
+        if not self.isMinimumMode():
+            self._barLayout.setGeometry(self.rect())
 
     def paintInNormalStyle(self):
         """绘制Office Style背景"""
