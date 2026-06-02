@@ -420,6 +420,8 @@ class SARibbonBar(QMenuBar):
 
     def showContextCategory(self, context: SARibbonContextCategory):
         """显示上下文标签"""
+        if not context:
+            return
         if self.isContextCategoryVisible(context):
             return
 
