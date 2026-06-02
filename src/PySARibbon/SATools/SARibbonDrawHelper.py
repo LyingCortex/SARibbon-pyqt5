@@ -13,7 +13,7 @@ class SARibbonDrawHelper:
     @staticmethod
     def iconToPixmap(icon: QIcon, widget: QWidget, opt: QStyleOption, icoSize: QSize) -> QPixmap:
         mode = QIcon.Normal
-        if not (opt.state & QStyle.State_Enabled):
+        if not (bool(opt.state & QStyle.State_Enabled)):
             mode = QIcon.Disabled
         elif (opt.state & QStyle.State_MouseOver) and (opt.state & QStyle.State_AutoRaise):
             mode = QIcon.Active
@@ -40,7 +40,7 @@ class SARibbonDrawHelper:
             rect = _args[0]
 
         mode = QIcon.Normal
-        if not (opt.state & QStyle.State_Enabled):
+        if not (bool(opt.state & QStyle.State_Enabled)):
             mode = QIcon.Disabled
         elif (opt.state & QStyle.State_MouseOver) and (opt.state & QStyle.State_AutoRaise):
             mode = QIcon.Active
@@ -54,7 +54,7 @@ class SARibbonDrawHelper:
     @staticmethod
     def iconActualSize(icon: QIcon, opt: QStyleOption, icoSize: QSize) -> QSize:
         mode = QIcon.Normal
-        if not (opt.state & QStyle.State_Enabled):
+        if not (bool(opt.state & QStyle.State_Enabled)):
             mode = QIcon.Disabled
         elif (opt.state & QStyle.State_MouseOver) and (opt.state & QStyle.State_AutoRaise):
             mode = QIcon.Active
@@ -79,4 +79,4 @@ class SARibbonDrawHelper:
             rect = _args[0]
 
         painter.drawItemText(rect, align, opt.palette,
-                             opt.state & QStyle.State_Enabled, text)
+                             bool(opt.state & QStyle.State_Enabled), text)

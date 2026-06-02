@@ -183,7 +183,7 @@ class SARibbonToolButton(QToolButton):
     def createIconPixmap(self, opt: QStyleOptionToolButton) -> QPixmap:
         if not opt.icon.isNull():  # 有图标
             state = QIcon.On if opt.state & QStyle.State_On else QIcon.Off
-            if not (opt.state & QStyle.State_Enabled):
+            if not (bool(opt.state & QStyle.State_Enabled)):
                 mode = QIcon.Disabled
             elif (opt.state & QStyle.State_MouseOver) and (opt.state & QStyle.State_AutoRaise):
                 mode = QIcon.Active
@@ -335,7 +335,7 @@ class SARibbonToolButton(QToolButton):
                 if not self.style().styleHint(QStyle.SH_UnderlineShortcut, opt, self):
                     alignment |= Qt.TextHideMnemonic
                 self.style().drawItemText(p, textRect, alignment, opt.palette,
-                                          opt.state & QStyle.State_Enabled, opt.text, QPalette.ButtonText)
+                                          bool(opt.state & QStyle.State_Enabled), opt.text, QPalette.ButtonText)
                 return
             if opt.toolButtonStyle != Qt.ToolButtonIconOnly:
                 # 文本加图标情况
@@ -354,7 +354,7 @@ class SARibbonToolButton(QToolButton):
                     alignment |= Qt.AlignCenter
                 # 再绘制文本，对于Normal模式下的Largebutton，如果有菜单，箭头将在文本旁边
                 self.style().drawItemText(p, QStyle.visualRect(opt.direction, opt.rect, textRect), alignment, opt.palette,
-                                          opt.state & QStyle.State_Enabled, opt.text, QPalette.ButtonText)
+                                          bool(opt.state & QStyle.State_Enabled), opt.text, QPalette.ButtonText)
             else:
                 # 只有图标情况
                 if not hasArrow:
@@ -372,7 +372,7 @@ class SARibbonToolButton(QToolButton):
                 if not self.style().styleHint(QStyle.SH_UnderlineShortcut, opt, self):
                     alignment |= Qt.TextHideMnemonic
                 self.style().drawItemText(p, QStyle.visualRect(opt.direction, opt.rect, opt.rect.adjusted(2, 1, -2, -1)),
-                                          alignment, opt.palette, opt.state & QStyle.State_Enabled,
+                                          alignment, opt.palette, bool(opt.state & QStyle.State_Enabled),
                                           opt.text, QPalette.ButtonText)
             elif opt.toolButtonStyle != Qt.ToolButtonIconOnly:
                 # 文本加图标情况
@@ -391,7 +391,7 @@ class SARibbonToolButton(QToolButton):
                     alignment = (Qt.AlignLeft | Qt.AlignVCenter) | alignment
                 # 绘制文本
                 self.style().drawItemText(p, QStyle.visualRect(opt.direction, opt.rect, tr), alignment, opt.palette,
-                                          opt.state & QStyle.State_Enabled, opt.text, QPalette.ButtonText)
+                                          bool(opt.state & QStyle.State_Enabled), opt.text, QPalette.ButtonText)
                 p.restore()
             else:
                 # 只有图标情况
