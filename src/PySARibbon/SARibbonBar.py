@@ -1077,6 +1077,9 @@ class SARibbonBar(QMenuBar):
 
     def onCurrentRibbonTabClicked(self, index: int):
         """此实现必须在eventfilter中传递stackedwidget的QEvent.MouseButtonDblClick事件到tabbar中，否则会导致双击变两次单击"""
+        if getattr(self, '_skipNextClick', False):
+            self._skipNextClick = False
+            return
         if index != self.m_d.ribbonTabBar.currentIndex():
             # 点击的标签不一致通过changed槽去处理
             return
@@ -1092,6 +1095,7 @@ class SARibbonBar(QMenuBar):
 
     def onCurrentRibbonTabDoubleClicked(self, index: int):
         """默认情况下双击会切换最小和正常模式"""
+        self._skipNextClick = True
         self.setMinimumMode(not self.isMinimumMode())
 
     def onContextsCategoryPageAdded(self, category: SARibbonCategory):
