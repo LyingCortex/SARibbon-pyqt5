@@ -444,15 +444,18 @@ class SARibbonToolButton(QToolButton):
 
     # 事件
     def event(self, e: QEvent) -> bool:
-        eList = [
-            QEvent.WindowDeactivate,
-            QEvent.ActionChanged,
-            QEvent.ActionRemoved,
-            QEvent.ActionAdded,
-        ]
-        if e.type() in eList:
-            self.m_mouseOnSubControl = False
-        return super().event(e)
+        try:
+            eList = [
+                QEvent.WindowDeactivate,
+                QEvent.ActionChanged,
+                QEvent.ActionRemoved,
+                QEvent.ActionAdded,
+            ]
+            if e.type() in eList:
+                self.m_mouseOnSubControl = False
+            return super().event(e)
+        except RuntimeError:
+            return False
 
     def paintEvent(self, e: QEvent):
         if self.m_buttonType == self.LargeButton:
