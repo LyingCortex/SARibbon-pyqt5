@@ -272,7 +272,8 @@ class SARibbonPanelLayout(QLayout):
                 item.columnIndex = -1
                 continue
 
-            if item.widget() and (item.widget().sizePolicy().horizontalPolicy() & QSizePolicy.ExpandFlag):
+            if item.widget() and item.widget().sizePolicy().horizontalPolicy() in (
+                    QSizePolicy.Expanding, QSizePolicy.MinimumExpanding):
                 self._expandFlag = True
             exp = item.expandingDirections()
             rp = item.rowProportion

@@ -189,10 +189,10 @@ if PYQT_VERSION == 6:
 
     # QSizePolicy shortcuts
     QSizePolicy.Expanding = QSizePolicy.Policy.Expanding
+    QSizePolicy.MinimumExpanding = QSizePolicy.Policy.MinimumExpanding
     QSizePolicy.Preferred = QSizePolicy.Policy.Preferred
     QSizePolicy.Maximum = QSizePolicy.Policy.Maximum
     QSizePolicy.Fixed = QSizePolicy.Policy.Fixed
-    QSizePolicy.ExpandFlag = QSizePolicy.Policy.Expanding  # approximate
 
     # QToolButton shortcuts
     QToolButton.InstantPopup = QToolButton.ToolButtonPopupMode.InstantPopup
