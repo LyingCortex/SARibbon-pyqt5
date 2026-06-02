@@ -30,7 +30,7 @@ class SARibbonStackedWidget(QStackedWidget):
             self.eventLoop.exit()
             self.eventLoop = None
         self.setMouseTracking(False)
-        self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.Widget)
         self.setFrameShape(QFrame.NoFrame)
 
     def isNormalMode(self) -> bool:
