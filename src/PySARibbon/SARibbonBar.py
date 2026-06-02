@@ -160,6 +160,7 @@ class SARibbonBarPrivate:
         self.stackedContainerWidget.setNormalMode()
         self.stackedContainerWidget.setFocus()
         self.stackedContainerWidget.show()
+        self.mainClass.setFixedHeight(self.mainClass.mainBarHeight())
 
     def getContextCategoryColor(self) -> QColor:
         if not self.mContextCategoryColorList:
