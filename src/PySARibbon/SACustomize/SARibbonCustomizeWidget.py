@@ -16,7 +16,7 @@ from ..compat import Qt, QXmlStreamReader, QModelIndex, QDateTime, QXmlStreamWri
     QSpacerItem, QPushButton, QRadioButton, QButtonGroup, QTreeView, QToolButton, QSizePolicy, QAbstractItemView, \
     QApplication, QMessageBox, QInputDialog
 
-from PySARibbon.SAWidgets import SARibbonPannelItem
+from PySARibbon.SAWidgets import SARibbonPanelItem
 from .SARibbonActionsManager import SARibbonActionsManager, SARibbonActionsManagerModel
 from .SARibbonCustomizeData import SARibbonCustomizeData
 
@@ -40,7 +40,7 @@ class SARibbonCustomizeWidget(QWidget):
         self.ui.comboBoxActionIndex.currentIndexChanged.connect(self.onComboBoxActionIndexCurrentIndexChanged)
         self.ui.radioButtonGroup.buttonClicked.connect(self.onRadioButtonGroupButtonClicked)
         self.ui.pushButtonNewCategory.clicked.connect(self.onPushButtonNewCategoryClicked)
-        self.ui.pushButtonNewPannel.clicked.connect(self.onPushButtonNewPannelClicked)
+        self.ui.pushButtonNewPanel.clicked.connect(self.onPushButtonNewPanelClicked)
         self.ui.pushButtonRename.clicked.connect(self.onPushButtonRenameClicked)
         self.ui.pushButtonAdd.clicked.connect(self.onPushButtonAddClicked)
         self.ui.pushButtonDelete.clicked.connect(self.onPushButtonDeleteClicked)
@@ -85,12 +85,12 @@ class SARibbonCustomizeWidget(QWidget):
                 if bar:
                     self.ui.comboBoxActionProportion.clear()
                     if bar.isTwoRowStyle():
-                        self.ui.comboBoxActionProportion.addItem('large', SARibbonPannelItem.RPLarge)
-                        self.ui.comboBoxActionProportion.addItem('small', SARibbonPannelItem.RPSmall)
+                        self.ui.comboBoxActionProportion.addItem('large', SARibbonPanelItem.RPLarge)
+                        self.ui.comboBoxActionProportion.addItem('small', SARibbonPanelItem.RPSmall)
                     else:
-                        self.ui.comboBoxActionProportion.addItem('large', SARibbonPannelItem.RPLarge)
-                        self.ui.comboBoxActionProportion.addItem('medium', SARibbonPannelItem.RPMedium)
-                        self.ui.comboBoxActionProportion.addItem('small', SARibbonPannelItem.RPSmall)
+                        self.ui.comboBoxActionProportion.addItem('large', SARibbonPanelItem.RPLarge)
+                        self.ui.comboBoxActionProportion.addItem('medium', SARibbonPanelItem.RPMedium)
+                        self.ui.comboBoxActionProportion.addItem('small', SARibbonPanelItem.RPSmall)
 
     def applys(self) -> bool:
         """应用所有设定"""
@@ -183,7 +183,7 @@ class SARibbonCustomizeWidget(QWidget):
 
     def selectedRibbonLevel(self) -> int:
         """获取选中的ribbon tree 的level
-        :return: -1为选中异常，0代表选中了category 1代表选中了pannel 2代表选中了action
+        :return: -1为选中异常，0代表选中了category 1代表选中了panel 2代表选中了action
         """
         item = self.selectedItem()
         if item:
@@ -260,21 +260,21 @@ class SARibbonCustomizeWidget(QWidget):
         ni.setData(True, SARibbonCustomizeWidget.CustomizeRole)
         ni.setData(d.categoryObjNameValue, SARibbonCustomizeWidget.CustomizeObjNameRole)
 
-    def onPushButtonNewPannelClicked(self):
+    def onPushButtonNewPanelClicked(self):
         item: QStandardItem = self.selectedItem()
         if not item:
             return
 
         level: int = self.selectedRibbonLevel()
-        self.m_d.mCustomizePannelCount += 1
-        ni: QStandardItem = QStandardItem("pannel[customize]{0}".format(self.m_d.mCustomizePannelCount))
+        self.m_d.mCustomizePanelCount += 1
+        ni: QStandardItem = QStandardItem("panel[customize]{0}".format(self.m_d.mCustomizePanelCount))
         ni.setData(1, SARibbonCustomizeWidget.LevelRole)
 
         if 0 == level:
             # 说明是category,插入到最后
             item.appendRow(ni)
         elif 1 == level:
-            # 说明选择的是pannel，插入到此pannel之后
+            # 说明选择的是panel，插入到此panel之后
             categoryItem: QStandardItem = item.parent()
             if categoryItem is None:
                 return
@@ -286,13 +286,13 @@ class SARibbonCustomizeWidget(QWidget):
         # 查找category的object name
         categoryItem: QStandardItem = ni.parent()
         categoryObjName = self.m_d.itemObjectName(categoryItem)
-        d = SARibbonCustomizeData.makeAddPannelCustomizeData(ni.text(), ni.row(),
-                                                             categoryObjName, SARibbonCustomizeWidgetPrivate.makeRandomObjName("pannel"))
+        d = SARibbonCustomizeData.makeAddPanelCustomizeData(ni.text(), ni.row(),
+                                                             categoryObjName, SARibbonCustomizeWidgetPrivate.makeRandomObjName("panel"))
 
         self.m_d.mCustomizeDatas.append(d)
         ni.setData(True, SARibbonCustomizeWidget.CanCustomizeRole)  # 有CustomizeRole，必有CanCustomizeRole
         ni.setData(True, SARibbonCustomizeWidget.CustomizeRole)
-        ni.setData(d.pannelObjNameValue, SARibbonCustomizeWidget.CustomizeObjNameRole)
+        ni.setData(d.panelObjNameValue, SARibbonCustomizeWidget.CustomizeObjNameRole)
         self.setSelectItem(ni)
 
     def onPushButtonRenameClicked(self):
@@ -312,8 +312,8 @@ class SARibbonCustomizeWidget(QWidget):
             self.m_d.mCustomizeDatas.append(d)
         elif 1 == level:
             cateObjName: str = self.m_d.itemObjectName(item.parent())
-            pannelObjName: str = self.m_d.itemObjectName(item)
-            d = SARibbonCustomizeData.makeRenamePannelCustomizeData(text, cateObjName,  pannelObjName)
+            panelObjName: str = self.m_d.itemObjectName(item)
+            d = SARibbonCustomizeData.makeRenamePanelCustomizeData(text, cateObjName,  panelObjName)
             self.m_d.mCustomizeDatas.append(d)
         else:
             # action 不允许改名
@@ -332,15 +332,15 @@ class SARibbonCustomizeWidget(QWidget):
             # 选中category不进行操作
             return
         elif 2 == level:
-            # 选中action，添加到这个action之后,把item设置为pannel
+            # 选中action，添加到这个action之后,把item设置为panel
             item = item.parent()
 
-        pannelObjName: str = self.m_d.itemObjectName(item)
+        panelObjName: str = self.m_d.itemObjectName(item)
         categoryObjName: str = self.m_d.itemObjectName(item.parent())
         key: str = self.m_d.mActionMgr.key(act)
 
         d = SARibbonCustomizeData.makeAddActionCustomizeData(key, self.m_d.mActionMgr, self.selectedRowProportion(),
-                                                             categoryObjName, pannelObjName)
+                                                             categoryObjName, panelObjName)
         self.m_d.mCustomizeDatas.append(d)
 
         actItem: QStandardItem = QStandardItem(act.icon(), act.text())
@@ -365,21 +365,21 @@ class SARibbonCustomizeWidget(QWidget):
             d = SARibbonCustomizeData.makeRemoveCategoryCustomizeData(self.m_d.itemObjectName(item))
             self.m_d.mCustomizeDatas.append(d)
         elif 1 == level:
-            # 删除pannel
+            # 删除panel
             catObjName: str = self.m_d.itemObjectName(item.parent())
-            pannelObjName: str = self.m_d.itemObjectName(item)
-            d = SARibbonCustomizeData.makeRemovePannelCustomizeData(catObjName, pannelObjName)
+            panelObjName: str = self.m_d.itemObjectName(item)
+            d = SARibbonCustomizeData.makeRemovePanelCustomizeData(catObjName, panelObjName)
             self.m_d.mCustomizeDatas.append(d)
         elif 2 == level:
             # 删除Action
             catObjName: str = self.m_d.itemObjectName(item.parent().parent())
-            pannelObjName: str = self.m_d.itemObjectName(item.parent())
+            panelObjName: str = self.m_d.itemObjectName(item.parent())
             act: QAction = self.itemToAction(item)
             key: str = self.m_d.mActionMgr.key(act)
-            if not key or not catObjName or not pannelObjName:
+            if not key or not catObjName or not panelObjName:
                 return
 
-            d = SARibbonCustomizeData.makeRemoveActionCustomizeData(catObjName, pannelObjName,
+            d = SARibbonCustomizeData.makeRemoveActionCustomizeData(catObjName, panelObjName,
                                                                     key, self.m_d.mActionMgr)
             self.m_d.mCustomizeDatas.append(d)
 
@@ -423,27 +423,27 @@ class SARibbonCustomizeWidget(QWidget):
             self.m_d.mRibbonModel.insertRow(r - 1, item)
         elif 1 == level:
             paritem: QStandardItem = item.parent()
-            d = SARibbonCustomizeData.makeChangePannelOrderCustomizeData(self.m_d.itemObjectName(paritem), self.m_d.itemObjectName(item), -1)
+            d = SARibbonCustomizeData.makeChangePanelOrderCustomizeData(self.m_d.itemObjectName(paritem), self.m_d.itemObjectName(item), -1)
             self.m_d.mCustomizeDatas.append(d)
             r: int = item.row()
             item = paritem.takeChild(r)
             paritem.removeRow(r)
             paritem.insertRow(r - 1, item)
         elif 2 == level:
-            pannelItem: QStandardItem = item.parent()
-            categoryItem: QStandardItem = pannelItem.parent()
+            panelItem: QStandardItem = item.parent()
+            categoryItem: QStandardItem = panelItem.parent()
             act: QAction = self.itemToAction(item)
             if not act:
                 return
 
             key: str = self.m_d.mActionMgr.key(act)
             d = SARibbonCustomizeData.makeChangeActionOrderCustomizeData(self.m_d.itemObjectName(categoryItem),
-                                                                         self.m_d.itemObjectName(pannelItem), key, self.m_d.mActionMgr, -1)
+                                                                         self.m_d.itemObjectName(panelItem), key, self.m_d.mActionMgr, -1)
             self.m_d.mCustomizeDatas.append(d)
             r: int = item.row()
-            item = pannelItem.takeChild(r)
-            pannelItem.removeRow(r)
-            pannelItem.insertRow(r - 1, item)
+            item = panelItem.takeChild(r)
+            panelItem.removeRow(r)
+            panelItem.insertRow(r - 1, item)
 
     def onToolButtonDownClicked(self):
         item: QStandardItem = self.selectedItem()
@@ -468,27 +468,27 @@ class SARibbonCustomizeWidget(QWidget):
             self.m_d.mRibbonModel.insertRow(r + 1, item)
         elif 1 == level:
             paritem: QStandardItem = item.parent()
-            d = SARibbonCustomizeData.makeChangePannelOrderCustomizeData(self.m_d.itemObjectName(paritem), self.m_d.itemObjectName(item), 1)
+            d = SARibbonCustomizeData.makeChangePanelOrderCustomizeData(self.m_d.itemObjectName(paritem), self.m_d.itemObjectName(item), 1)
             self.m_d.mCustomizeDatas.append(d)
             r: int = item.row()
             item = paritem.takeChild(r)
             paritem.removeRow(r)
             paritem.insertRow(r + 1, item)
         elif 2 == level:
-            pannelItem: QStandardItem = item.parent()
-            categoryItem: QStandardItem = pannelItem.parent()
+            panelItem: QStandardItem = item.parent()
+            categoryItem: QStandardItem = panelItem.parent()
             act: QAction = self.itemToAction(item)
             if not act:
                 return
 
             key: str = self.m_d.mActionMgr.key(act)
             d = SARibbonCustomizeData.makeChangeActionOrderCustomizeData(self.m_d.itemObjectName(categoryItem),
-                                                                         self.m_d.itemObjectName(pannelItem), key, self.m_d.mActionMgr, 1)
+                                                                         self.m_d.itemObjectName(panelItem), key, self.m_d.mActionMgr, 1)
             self.m_d.mCustomizeDatas.append(d)
             r: int = item.row()
-            item = pannelItem.takeChild(r)
-            pannelItem.removeRow(r)
-            pannelItem.insertRow(r + 1, item)
+            item = panelItem.takeChild(r)
+            panelItem.removeRow(r)
+            panelItem.insertRow(r + 1, item)
 
     def onItemChanged(self, item: QStandardItem):
         if item is None:
@@ -542,7 +542,7 @@ class SARibbonCustomizeWidget(QWidget):
             xml.writeAttribute('index', str(d.indexValue))
             xml.writeAttribute('key', d.keyValue)
             xml.writeAttribute('category', d.categoryObjNameValue)
-            xml.writeAttribute('pannel', d.pannelObjNameValue)
+            xml.writeAttribute('panel', d.panelObjNameValue)
             xml.writeAttribute('row-prop', str(d.actionRowProportionValue))
             xml.writeEndElement()
         xml.writeEndElement()
@@ -587,8 +587,8 @@ class SARibbonCustomizeWidget(QWidget):
                     d.keyValue = str(attrs.value('key'))
                 if attrs.hasAttribute('category'):
                     d.categoryObjNameValue = str(attrs.value('category'))
-                if attrs.hasAttribute('pannel'):
-                    d.pannelObjNameValue = str(attrs.value('pannel'))
+                if attrs.hasAttribute('panel'):
+                    d.panelObjNameValue = str(attrs.value('panel'))
                 if attrs.hasAttribute('row-prop'):
                     d.actionRowProportionValue = int(attrs.value('row-prop'))
 
@@ -635,10 +635,10 @@ class SARibbonCustomizeWidget(QWidget):
     ShowAllCategory = 0     # 显示所有Category，包括contextcategory
     ShowMainCategory = 1    # 显示主要的category，不包含上下文
     # ItemRole, QStandardItem对应的role
-    LevelRole = Qt.UserRole + 1             # 代表这是层级，有0：category 1：pannel 2：item
+    LevelRole = Qt.UserRole + 1             # 代表这是层级，有0：category 1：panel 2：item
     PointerRole = Qt.UserRole + 2           # 代表这是存放指针。根据LevelRole来进行转
     CanCustomizeRole = Qt.UserRole + 3      # 代表个item是可以自定义的.bool
-    CustomizeRole = Qt.UserRole + 4         # 代表这个是自定义的item,bool,主要用于那些自己添加的标签和pannel，有此角色必有CanCustomizeRole
+    CustomizeRole = Qt.UserRole + 4         # 代表这个是自定义的item,bool,主要用于那些自己添加的标签和panel，有此角色必有CanCustomizeRole
     CustomizeObjNameRole = Qt.UserRole + 5  # 记录了临时的自定义内容的obj名 QString
 
 
@@ -669,7 +669,7 @@ class SARibbonCustomizeWidgetUi:
         self.treeViewResult: QTreeView = None
         self.horizontalLayoutActionOptBtns: QHBoxLayout = None
         self.pushButtonNewCategory: QPushButton = None
-        self.pushButtonNewPannel: QPushButton = None
+        self.pushButtonNewPanel: QPushButton = None
         self.pushButtonRename: QPushButton = None
         self.verticalLayoutRightButtons: QVBoxLayout = None
         self.verticalSpacerUp2: QSpacerItem = None
@@ -766,9 +766,9 @@ class SARibbonCustomizeWidgetUi:
         self.pushButtonNewCategory = QPushButton(customizeWidget)
         self.pushButtonNewCategory.setObjectName('pushButtonNewCategory')
         self.horizontalLayoutActionOptBtns.addWidget(self.pushButtonNewCategory)
-        self.pushButtonNewPannel = QPushButton(customizeWidget)
-        self.pushButtonNewPannel.setObjectName('pushButtonNewPannel')
-        self.horizontalLayoutActionOptBtns.addWidget(self.pushButtonNewPannel)
+        self.pushButtonNewPanel = QPushButton(customizeWidget)
+        self.pushButtonNewPanel.setObjectName('pushButtonNewPanel')
+        self.horizontalLayoutActionOptBtns.addWidget(self.pushButtonNewPanel)
         self.pushButtonRename = QPushButton(customizeWidget)
         self.pushButtonRename.setObjectName('pushButtonRename')
         self.horizontalLayoutActionOptBtns.addWidget(self.pushButtonRename)
@@ -812,7 +812,7 @@ class SARibbonCustomizeWidgetUi:
         self.radioButtonMainCategory.setText(QApplication.translate('SARibbonCustomizeWidget', 'Main Category'))
         self.radioButtonAllCategory.setText(QApplication.translate('SARibbonCustomizeWidget', 'All Category'))
         self.pushButtonNewCategory.setText(QApplication.translate('SARibbonCustomizeWidget', 'New Category'))
-        self.pushButtonNewPannel.setText(QApplication.translate('SARibbonCustomizeWidget', 'New Pannel'))
+        self.pushButtonNewPanel.setText(QApplication.translate('SARibbonCustomizeWidget', 'New Panel'))
         self.pushButtonRename.setText(QApplication.translate('SARibbonCustomizeWidget', 'Rename'))
         self.pushButtonReset.setText(QApplication.translate('SARibbonCustomizeWidget', 'Reset'))
         self.labelProportion.setText(QApplication.translate('SARibbonCustomizeWidget', 'Proportion:'))
@@ -828,7 +828,7 @@ class SARibbonCustomizeWidgetPrivate:
         self.mAcionModel = SARibbonActionsManagerModel(w)  # action管理器对应的model
         self.mRibbonModel = QStandardItemModel(w)  # 用于很成ribbon的树
         self.mCustomizeCategoryCount = 0  # 记录自定义Category的个数
-        self.mCustomizePannelCount = 0  # 记录自定义Pannel的个数
+        self.mCustomizePanelCount = 0  # 记录自定义Panel的个数
         self.mCustomizeDatas: List = list()  # 记录所有的自定义动作
         self.mOldCustomizeDatas: List = list()  # 记录旧的自定义动作
 
@@ -860,7 +860,7 @@ class SARibbonCustomizeWidgetPrivate:
 
             ci.setData(0, SARibbonCustomizeWidget.LevelRole)
             ci.setData(c, SARibbonCustomizeWidget.PointerRole)
-            for p in c.pannelList():
+            for p in c.panelList():
                 pi = QStandardItem(p.windowTitle())
                 pi.setData(1, SARibbonCustomizeWidget.LevelRole)
                 pi.setData(p, SARibbonCustomizeWidget.PointerRole)
@@ -869,7 +869,7 @@ class SARibbonCustomizeWidgetPrivate:
                     pi.setData(True, SARibbonCustomizeWidget.CanCustomizeRole)
 
                 ci.appendRow(pi)
-                for i in p.ribbonPannelItem():
+                for i in p.ribbonPanelItem():
                     act = i.action
                     if not act or act.isSeparator():
                         continue
@@ -916,8 +916,8 @@ class SARibbonCustomizeWidgetPrivate:
         p = item.data(SARibbonCustomizeWidget.PointerRole)
         return p
 
-    def itemToPannel(self, item: QStandardItem) -> QWidget:
-        """把item转换为SARibbonPannel"""
+    def itemToPanel(self, item: QStandardItem) -> QWidget:
+        """把item转换为SARibbonPanel"""
         level = item.data(SARibbonCustomizeWidget.LevelRole)
         if level != 1:
             return None
@@ -931,7 +931,7 @@ class SARibbonCustomizeWidgetPrivate:
             return None
 
         # 这里要非常注意，SARibbonCustomizeWidget.CustomizeRole为true时，说明这个是自定义的内容，
-        # 这时PointerRole里存放的是action指针，不是SARibbonPannelItem
+        # 这时PointerRole里存放的是action指针，不是SARibbonPanelItem
         act: QAction = None
 
         if item.data(SARibbonCustomizeWidget.CustomizeRole):
@@ -957,9 +957,9 @@ class SARibbonCustomizeWidgetPrivate:
                     objName = category.objectName()
 
             elif 1 == level:
-                pannel = self.itemToPannel(item)
-                if pannel:
-                    objName = pannel.objectName()
+                panel = self.itemToPanel(item)
+                if panel:
+                    objName = panel.objectName()
 
         return (objName)
 

@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-@Module     SARibbonPannelLayout
+@Module     SARibbonPanelLayout
 @Author     ROOT
 
-@brief 针对SARibbonPannel的布局
+@brief 针对SARibbonPanel的布局
 
-SARibbonPannelLayout实际是一个列布局，每一列有2~3行，看窗口定占几行
-核心函数：SARibbonPannelLayout.createItem
+SARibbonPanelLayout实际是一个列布局，每一列有2~3行，看窗口定占几行
+核心函数：SARibbonPanelLayout.createItem
 """
 from typing import List, Union
 from .compat import QRect, QSize, Qt, QLayout, QAction, QLayoutItem, QWidget, QWidgetAction, QSizePolicy
 
-from .SAWidgets.SARibbonPannelItem import SARibbonPannelItem
+from .SAWidgets.SARibbonPanelItem import SARibbonPanelItem
 from .SAWidgets.SARibbonSeparatorWidget import SARibbonSeparatorWidget
 from .SAWidgets.SARibbonToolButton import SARibbonToolButton
 
@@ -21,11 +21,11 @@ G_ICON_HIGH_FOR_HIGHER_LARGE = 32
 G_ICON_HIGH_FOR_HIGHER_SMALL = 16
 
 
-class SARibbonPannelLayout(QLayout):
+class SARibbonPanelLayout(QLayout):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self._items: List[SARibbonPannelItem] = list()
+        self._items: List[SARibbonPanelItem] = list()
         self._rowCount = 3         # 默认3行，可通过setRowCount()函数设置
         self._columnCount = 0      # 记录有多少列
         self._expandFlag = False   # 标记是否是会扩展的
@@ -58,12 +58,12 @@ class SARibbonPannelLayout(QLayout):
         self.invalidate()  # 标记需要重新计算尺寸
         return
 
-    def addWidget(self, widget: QWidget, rp=SARibbonPannelItem.RPLarge) -> SARibbonPannelItem:
+    def addWidget(self, widget: QWidget, rp=SARibbonPanelItem.RPLarge) -> SARibbonPanelItem:
         widget.setParent(self.parentWidget())
 
         widget.setAttribute(Qt.WA_LayoutUsesWidgetRect)
         widget.hide()
-        item = SARibbonPannelItem(widget)
+        item = SARibbonPanelItem(widget)
         item.rowProportion = rp
         if isinstance(widget, SARibbonToolButton):
             btn: SARibbonToolButton = widget
@@ -72,7 +72,7 @@ class SARibbonPannelLayout(QLayout):
         self.addItem(item)
         return item
 
-    def addAction(self, action: QAction, rp=SARibbonPannelItem.RPNone) -> SARibbonPannelItem:
+    def addAction(self, action: QAction, rp=SARibbonPanelItem.RPNone) -> SARibbonPanelItem:
         if not isinstance(action, QAction):
             raise Exception('addAction() must get an QAction, please check you parameters')
 
@@ -80,7 +80,7 @@ class SARibbonPannelLayout(QLayout):
         button = SARibbonToolButton(parent)
         button.setAutoRaise(True)
         button.setFocusPolicy(Qt.NoFocus)
-        buttonType = SARibbonToolButton.LargeButton if rp == SARibbonPannelItem.RPLarge else SARibbonToolButton.SmallButton
+        buttonType = SARibbonToolButton.LargeButton if rp == SARibbonPanelItem.RPLarge else SARibbonToolButton.SmallButton
         if buttonType == SARibbonToolButton.LargeButton:
             ltp = SARibbonToolButton.Lite if self._rowCount == 2 else SARibbonToolButton.Normal
             button.setLargeButtonType(ltp)
@@ -130,14 +130,14 @@ class SARibbonPannelLayout(QLayout):
     def sizeHint(self) -> QSize:
         return self._sizeHint
 
-    def pannelItem(self, action: QAction) -> Union[None, SARibbonPannelItem]:
-        """通过action获取SARibbonPannelItem"""
+    def panelItem(self, action: QAction) -> Union[None, SARibbonPanelItem]:
+        """通过action获取SARibbonPanelItem"""
         index = self.indexOf(action)
         if index >= 0:
             return self._items[index]
         return None
 
-    def lastItem(self) -> Union[None, SARibbonPannelItem]:
+    def lastItem(self) -> Union[None, SARibbonPanelItem]:
         """获取最后一个添加的item"""
         if not self._items:
             return None
@@ -150,15 +150,15 @@ class SARibbonPannelLayout(QLayout):
             return item.widget()
         return None
 
-    def defaultPannelHeight(self) -> int:
-        """根据pannel的默认参数得到的pannel高度"""
-        pannel = self.parentWidget()
+    def defaultPanelHeight(self) -> int:
+        """根据panel的默认参数得到的panel高度"""
+        panel = self.parentWidget()
         high = G_HIGHER_MODE_HEIGHT
-        if not pannel:
+        if not panel:
             return high
-        if pannel.pannelLayoutMode() == SARibbonPannelLayout.ThreeRowMode:
+        if panel.panelLayoutMode() == SARibbonPanelLayout.ThreeRowMode:
             high = G_HIGHER_MODE_HEIGHT
-        elif pannel.pannelLayoutMode() == SARibbonPannelLayout.TwoRowMode:
+        elif panel.panelLayoutMode() == SARibbonPanelLayout.TwoRowMode:
             high = G_LOWER_MODE_HEIGHT
         return high
 
@@ -196,43 +196,43 @@ class SARibbonPannelLayout(QLayout):
             else:
                 item.setGeometry(item.itemWillSetGeometry)
                 showWidgets.append(item.widget())
-        # 不在上面那里进行show和hide因为会触发SARibbonPannelLayout的重绘，导致循环绘制，非常影响效率
+        # 不在上面那里进行show和hide因为会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
         for w in showWidgets:
             w.show()
         for w in hideWidgets:
             w.hide()
 
-    def createItem(self, action: QAction, rp=SARibbonPannelItem.RPNone) -> Union[None, SARibbonPannelItem]:
+    def createItem(self, action: QAction, rp=SARibbonPanelItem.RPNone) -> Union[None, SARibbonPanelItem]:
         """把action转换为item"""
-        pannel = self.parentWidget()
-        if not pannel:
+        panel = self.parentWidget()
+        if not panel:
             return None
         customWidget = False
         widget = None
         if isinstance(action, QWidgetAction):
-            widget = action.requestWidget(pannel)
+            widget = action.requestWidget(panel)
             print(__file__, 'createItem', type(widget))
             print(__file__, 'createItem', widget.sizeHint())
             if widget:
                 widget.setAttribute(Qt.WA_LayoutUsesWidgetRect)
                 customWidget = True
         elif action.isSeparator():
-            sep = SARibbonSeparatorWidget(pannel)
+            sep = SARibbonSeparatorWidget(panel)
             widget = sep
         if not widget:
-            button = SARibbonToolButton(pannel)
+            button = SARibbonToolButton(panel)
             button.setAutoRaise(True)
             button.setFocusPolicy(Qt.NoFocus)
-            buttonType = SARibbonToolButton.LargeButton if rp == SARibbonPannelItem.RPLarge else SARibbonToolButton.SmallButton
+            buttonType = SARibbonToolButton.LargeButton if rp == SARibbonPanelItem.RPLarge else SARibbonToolButton.SmallButton
             button.setButtonType(buttonType)
             if buttonType == SARibbonToolButton.LargeButton:
-                ltp = SARibbonToolButton.Lite if pannel.isTwoRow() else SARibbonToolButton.Normal
+                ltp = SARibbonToolButton.Lite if panel.isTwoRow() else SARibbonToolButton.Normal
                 button.setLargeButtonType(ltp)
             button.setDefaultAction(action)
-            button.triggered.connect(pannel.actionTriggered)
+            button.triggered.connect(panel.actionTriggered)
             widget = button
         widget.hide()
-        result = SARibbonPannelItem(widget)
+        result = SARibbonPanelItem(widget)
         result.rowProportion = rp
         result.customWidget = customWidget
         result.action = action
@@ -243,8 +243,8 @@ class SARibbonPannelLayout(QLayout):
             return
 
         height = setRect.height()
-        pannel = self.parentWidget()
-        titleH = pannel.titleHeight() if hasattr(pannel, 'titleHeight') else 0
+        panel = self.parentWidget()
+        titleH = panel.titleHeight() if hasattr(panel, 'titleHeight') else 0
         magin = self.contentsMargins()
         spacing = self.spacing()
         rowCount = self._rowCount  # rowcount 是ribbon的行，有2行和3行两种
@@ -257,7 +257,7 @@ class SARibbonPannelLayout(QLayout):
         columMaxWidth = 0   # 记录每列最大的宽度
         totalWidth = 0      # 记录总宽度
         x = magin.left()    # x坐标
-        lastRow0RP = SARibbonPannelItem.RPNone
+        lastRow0RP = SARibbonPanelItem.RPNone
         # Medium行的y坐标
         medy0 = magin.top() if rowCount == 2 else magin.top() + (largeH - 2 * smallH) / 3
         medy1 = magin.top() + smallH + spacing if rowCount == 2 else magin.top() + (
@@ -276,8 +276,8 @@ class SARibbonPannelLayout(QLayout):
                 self._expandFlag = True
             exp = item.expandingDirections()
             rp = item.rowProportion
-            if SARibbonPannelItem.RPNone == rp:
-                rp = SARibbonPannelItem.RPLarge if (exp & Qt.Vertical) else SARibbonPannelItem.RPSmall
+            if SARibbonPanelItem.RPNone == rp:
+                rp = SARibbonPanelItem.RPLarge if (exp & Qt.Vertical) else SARibbonPanelItem.RPSmall
             hint = item.sizeHint()
 
             # SingleRowMode: 所有item在同一行横向排列
@@ -289,7 +289,7 @@ class SARibbonPannelLayout(QLayout):
                 row = 0
                 column += 1
                 columMaxWidth = 0
-            elif SARibbonPannelItem.RPLarge == rp:
+            elif SARibbonPanelItem.RPLarge == rp:
                 # 在Large模式，如果不是处于新列的第一行，就需要进行换列处理
                 if row != 0:
                     x += columMaxWidth + spacing
@@ -302,7 +302,7 @@ class SARibbonPannelLayout(QLayout):
                 row = 0
                 column += 1
                 columMaxWidth = 0
-            elif SARibbonPannelItem.RPMedium == rp:
+            elif SARibbonPanelItem.RPMedium == rp:
                 if row > 1:  # row == 2表示前面一个item是small模式
                     x += columMaxWidth + spacing
                     row = 0
@@ -314,7 +314,7 @@ class SARibbonPannelLayout(QLayout):
                     item.itemWillSetGeometry = QRect(int(x), int(medy0), int(hint.width()), int(smallH))
                     row = 1
                     columMaxWidth = hint.width()
-                    lastRow0RP = SARibbonPannelItem.RPMedium
+                    lastRow0RP = SARibbonPanelItem.RPMedium
                 else:
                     item.itemWillSetGeometry = QRect(int(x), int(medy1), int(hint.width()), int(smallH))
                     # 换列
@@ -322,19 +322,19 @@ class SARibbonPannelLayout(QLayout):
                     row = 0
                     column += 1
                     columMaxWidth = 0
-            else:   # SARibbonPannelItem.RPSmall
+            else:   # SARibbonPanelItem.RPSmall
                 item.rowIndex = row
                 item.columnIndex = column
                 if row == 0:
                     item.itemWillSetGeometry = QRect(int(x), int(smly0), int(hint.width()), int(smallH))
                     columMaxWidth = hint.width()
                     row = 1
-                    lastRow0RP = SARibbonPannelItem.RPSmall
+                    lastRow0RP = SARibbonPanelItem.RPSmall
                 elif row == 1:
                     # 若第一行是Medium，按Medium排列
-                    y1 = medy1 if lastRow0RP == SARibbonPannelItem.RPMedium else smly1
+                    y1 = medy1 if lastRow0RP == SARibbonPanelItem.RPMedium else smly1
                     item.itemWillSetGeometry = QRect(int(x), int(y1), int(hint.width()), int(smallH))
-                    if 2 == rowCount or lastRow0RP == SARibbonPannelItem.RPMedium:
+                    if 2 == rowCount or lastRow0RP == SARibbonPanelItem.RPMedium:
                         x += max(columMaxWidth, hint.width()) + spacing
                         row = 0
                         column += 1
@@ -429,7 +429,7 @@ class SARibbonPannelLayout(QLayout):
                 rmaximum = max(rmaximum, item.widget().maximumWidth())
         return rwidth, rmaximum
 
-    # PannelLayoutMode
+    # PanelLayoutMode
     ThreeRowMode = 0
     TwoRowMode = 1
     SingleRowMode = 2

@@ -3,7 +3,7 @@
 @Module     SARibbonLineWidgetContainer
 @Author     ROOT
 
-@brief 一个窗口容器，把窗口放置中间，前面后面都可以设置文本，主要用于放置在pannel上的小窗口
+@brief 一个窗口容器，把窗口放置中间，前面后面都可以设置文本，主要用于放置在panel上的小窗口
 实现如下效果：
 PrefixLabel|_Widget_|SuffixLabel
 """

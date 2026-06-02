@@ -14,15 +14,15 @@ SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibb
 SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
 Ribbon是有明显的层级关系:
 SARibbonBar下面是 @ref SARibbonCategory，
-SARibbonCategory下面是@ref SARibbonPannel，
-SARibbonPannel下面是@ref SARibbonToolButton，
+SARibbonCategory下面是@ref SARibbonPanel，
+SARibbonPanel下面是@ref SARibbonToolButton，
 SARibbonToolButton管理着QAction
 
 生成一个ribbon只需以下几个函数：
 SARibbonBar.addCategoryPage(title: str) -> SARibbonCategory
-SARibbonCategory.addPannel(title: str) -> SARibbonPannel
-SARibbonPannel.addLargeAction(action: QAction) -> SARibbonToolButton
-SARibbonPannel.addSmallAction(action: QAction) -> SARibbonToolButton
+SARibbonCategory.addPanel(title: str) -> SARibbonPanel
+SARibbonPanel.addLargeAction(action: QAction) -> SARibbonToolButton
+SARibbonPanel.addSmallAction(action: QAction) -> SARibbonToolButton
 
 因此生成步骤如下：
 @code
@@ -30,20 +30,20 @@ de setupRibbonUi():
     ......
     # ribbonwindow为SARibbonMainWindow
     categoryMain = SARibbonCategory()
-    filePannel = SARibbonPannel()
+    filePanel = SARibbonPanel()
 
     ribbon = ribbonwindow.ribbonBar()
     ribbon.setRibbonStyle(SARibbonBar::WpsLiteStyle)
     # 添加一个Main标签
     categoryMain = ribbon.addCategoryPage("Main")
-    # Main标签下添加一个FilePannel
-    filePannel = categoryMain.addPannel("FilePannel")
-    # 开始为File Pannel添加action
-    filePannel.addLargeAction(actionNew)
-    filePannel.addLargeAction(actionOpen)
-    filePannel.addLargeAction(actionSave)
-    filePannel.addSmallAction(actionImportMesh)
-    filePannel.addSmallAction(actionImportGeometry)
+    # Main标签下添加一个FilePanel
+    filePanel = categoryMain.addPanel("FilePanel")
+    # 开始为File Panel添加action
+    filePanel.addLargeAction(actionNew)
+    filePanel.addLargeAction(actionOpen)
+    filePanel.addLargeAction(actionSave)
+    filePanel.addSmallAction(actionImportMesh)
+    filePanel.addSmallAction(actionImportGeometry)
     ......
 @endcode
 """
@@ -57,7 +57,7 @@ from .SATools.SARibbonElementManager import RibbonSubElementStyleOpt, RibbonSubE
 from .SARibbonButtonGroupWidget import SARibbonButtonGroupWidget
 from .SARibbonQuickAccessBar import SARibbonQuickAccessBar
 from .SARibbonBarLayout import SARibbonBarLayout
-from .SARibbonPannel import SARibbonPannel
+from .SARibbonPanel import SARibbonPanel
 from .SARibbonCategory import SARibbonCategory
 from .SARibbonContextCategory import SARibbonContextCategory
 
@@ -245,8 +245,8 @@ class SARibbonBar(QMenuBar):
         else:
             category: SARibbonCategory = __args[0]
             category.setRibbonBar(self)
-            mode = self._pannelLayoutMode()
-            category.setRibbonPannelLayoutMode(mode)
+            mode = self._panelLayoutMode()
+            category.setRibbonPanelLayoutMode(mode)
             index = self.m_d.ribbonTabBar.addTab(category.windowTitle())
 
             tabdata = _SARibbonTabData()
@@ -276,8 +276,8 @@ class SARibbonBar(QMenuBar):
             category: SARibbonCategory = __args[0]
             index = __args[1]
             i = self.m_d.ribbonTabBar.insertTab(index, category.windowTitle())
-            mode = self._pannelLayoutMode()
-            category.setRibbonPannelLayoutMode(mode)
+            mode = self._panelLayoutMode()
+            category.setRibbonPanelLayoutMode(mode)
 
             tabdata = _SARibbonTabData()
             tabdata.category = category
@@ -427,8 +427,8 @@ class SARibbonBar(QMenuBar):
         contextCategoryData.contextCategory = context
         for i in range(context.categoryCount()):
             category = context.categoryPage(i)
-            mode = self._pannelLayoutMode()
-            category.setRibbonPannelLayoutMode(mode)
+            mode = self._panelLayoutMode()
+            category.setRibbonPanelLayoutMode(mode)
             index = self.m_d.ribbonTabBar.addTab(category.windowTitle())
             contextCategoryData.tabPageIndex.append(index)
 
@@ -508,7 +508,7 @@ class SARibbonBar(QMenuBar):
         if isShow:
             rightBar = self.activeTabBarRightButtonGroup()
             if not self.m_d.minimumCaterogyAction:
-                panBtn = RibbonSubElementDelegate.createHidePannelButton(self)
+                panBtn = RibbonSubElementDelegate.createHidePanelButton(self)
                 panBtn.ensurePolished()     # 载入样式图标
                 icon = QStyle.SP_TitleBarShadeButton if self.isMinimumMode() else QStyle.SP_TitleBarUnshadeButton
                 action = QAction(self.style().standardIcon(icon), 'Hide', panBtn)
@@ -595,14 +595,14 @@ class SARibbonBar(QMenuBar):
         """设置是否显示 Panel 标题"""
         categorys = self.categoryPages()
         for c in categorys:
-            for p in c.pannelList():
+            for p in c.panelList():
                 p.setEnableShowTitle(enable)
 
     def isEnableShowPanelTitle(self) -> bool:
         """判断是否显示 Panel 标题（取第一个 panel 的状态）"""
         categorys = self.categoryPages()
         for c in categorys:
-            panels = c.pannelList()
+            panels = c.panelList()
             if panels:
                 return panels[0].isEnableShowTitle()
         return True
@@ -638,24 +638,24 @@ class SARibbonBar(QMenuBar):
     def setEnableWordWrap(self, enable: bool):
         """设置所有按钮是否允许文字换行，级联到所有 Category/Panel/Button"""
         for c in self.categoryPages():
-            for p in c.pannelList():
+            for p in c.panelList():
                 p.setEnableWordWrap(enable)
 
     def isEnableWordWrap(self) -> bool:
         for c in self.categoryPages():
-            for p in c.pannelList():
+            for p in c.panelList():
                 return p.isEnableWordWrap()
         return False
 
     def setEnableIconRightText(self, enable: bool):
         """设置所有按钮强制图标左文字右，级联到所有 Category/Panel/Button"""
         for c in self.categoryPages():
-            for p in c.pannelList():
+            for p in c.panelList():
                 p.setEnableIconRightText(enable)
 
     def isEnableIconRightText(self) -> bool:
         for c in self.categoryPages():
-            for p in c.pannelList():
+            for p in c.panelList():
                 return p.isEnableIconRightText()
         return False
 
@@ -702,13 +702,13 @@ class SARibbonBar(QMenuBar):
         """判断当前的样式是否为单行"""
         return SARibbonBar.checkSingleRowStyle(self.currentRibbonStyle())
 
-    def _pannelLayoutMode(self) -> int:
-        """根据当前样式返回对应的PannelLayoutMode"""
+    def _panelLayoutMode(self) -> int:
+        """根据当前样式返回对应的PanelLayoutMode"""
         if self.isSingleRowStyle():
-            return SARibbonPannel.SingleRowMode
+            return SARibbonPanel.SingleRowMode
         elif self.isTwoRowStyle():
-            return SARibbonPannel.TwoRowMode
-        return SARibbonPannel.ThreeRowMode
+            return SARibbonPanel.TwoRowMode
+        return SARibbonPanel.ThreeRowMode
 
     def isOfficeStyle(self) -> bool:
         """判断当前的样式是否为office样式"""
@@ -793,13 +793,13 @@ class SARibbonBar(QMenuBar):
         """根据样式调整SARibbonCategory的布局形式"""
         categorys = self.categoryPages()
         if self.isSingleRowStyle():
-            mode = SARibbonPannel.SingleRowMode
+            mode = SARibbonPanel.SingleRowMode
         elif self.isTwoRowStyle():
-            mode = SARibbonPannel.TwoRowMode
+            mode = SARibbonPanel.TwoRowMode
         else:
-            mode = SARibbonPannel.ThreeRowMode
+            mode = SARibbonPanel.ThreeRowMode
         for c in categorys:
-            c.setRibbonPannelLayoutMode(mode)
+            c.setRibbonPanelLayoutMode(mode)
         if SARibbonBar.NormalRibbonMode == self.currentRibbonState():
             self.setFixedHeight(self.mainBarHeight())
 

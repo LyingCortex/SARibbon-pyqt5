@@ -160,7 +160,7 @@ SARibbonControlButton#SARibbonGalleryButtonUp, #SARibbonGalleryButtonDown, #SARi
   border: 1px solid #cee8fc;
 }
 
-SARibbonControlButton#SARibbonBarHidePannelButton {
+SARibbonControlButton#SARibbonBarHidePanelButton {
   border: 1px solid transparent;
 }
 
@@ -206,21 +206,21 @@ SARibbonMenu::icon {
   margin-left: 1px;
 }
 
-/*SARibbonPannelOptionButton*/
+/*SARibbonPanelOptionButton*/
 
-SARibbonPannelOptionButton {
+SARibbonPanelOptionButton {
   background-color: transparent;
   color: #333;
 }
 
-SARibbonPannelOptionButton::hover {
+SARibbonPanelOptionButton::hover {
   background-color: #cee7fc;
   border: 0px;
 }
 
-/*SARibbonPannel*/
+/*SARibbonPanel*/
 
-SARibbonPannel {
+SARibbonPanel {
   background-color: white;
   border: 0px;
 }

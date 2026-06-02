@@ -14,8 +14,8 @@ from .SARibbonCategoryLayout import SARibbonCategoryLayout
 from .SARibbonContextCategory import SARibbonContextCategory
 from .SARibbonGallery import SARibbonGallery
 from .SARibbonMainWindow import SARibbonMainWindow
-from .SARibbonPannel import SARibbonPannel
-from .SARibbonPannelLayout import SARibbonPannelLayout
+from .SARibbonPanel import SARibbonPanel
+from .SARibbonPanelLayout import SARibbonPanelLayout
 from .SARibbonQuickAccessBar import SARibbonQuickAccessBar
 from .SARibbonSystemButtonBar import SARibbonSystemButtonBar
 from .SARibbonWidget import SARibbonWidget

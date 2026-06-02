@@ -21,7 +21,7 @@ SARibbonActionsManager.UserDefineActionTag值的基础上进行累加。
 管理的所有标签。
 
 通过@ref autoRegisteActions 函数可以快速的建立action的管理，此函数会遍历@ref SARibbonMainWindow 下的所有子object，
-同时遍历SARibbonMainWindow下所有@ref SARibbonPannel 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可
+同时遍历SARibbonMainWindow下所有@ref SARibbonPanel 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可
 """
 from typing import Any
 from ..compat import Qt, QObject, QAbstractListModel, QModelIndex, pyqtSignal, QAction, QWidget
@@ -188,8 +188,8 @@ class SARibbonActionsManager(QObject):
         tag: int = self.AutoCategoryDistinguishBeginTag
 
         for c in categorys:
-            pannels: list = c.pannelList()
-            for p in pannels:
+            panels: list = c.panelList()
+            for p in panels:
                 categoryActions.update(self.autoRegisteWidgetActions(p, tag, False))
             self.setTagName(tag, c.windowTitle())
             res[tag] = c

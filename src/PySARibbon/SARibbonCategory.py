@@ -12,15 +12,15 @@ from .compat import QSize, Qt, QEvent, QBrush, QPalette, QWidget, QMenuBar
 
 from .SATools.SARibbonElementManager import RibbonSubElementDelegate
 from .SARibbonCategoryLayout import SARibbonCategoryLayout
-from .SARibbonPannel import SARibbonPannel
+from .SARibbonPanel import SARibbonPanel
 
 
 class SARibbonCategory(QWidget):
-    """Ribbon标签页，承载多个SARibbonPannel"""
+    """Ribbon标签页，承载多个SARibbonPanel"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._defaultPannelLayoutMode = SARibbonPannel.ThreeRowMode
+        self._defaultPanelLayoutMode = SARibbonPanel.ThreeRowMode
         self._isContextCategory = False
         self._isCanCustomize = True
         self._bar: QMenuBar = None
@@ -43,99 +43,99 @@ class SARibbonCategory(QWidget):
     def setCategoryName(self, title: str):
         self.setWindowTitle(title)
 
-    # --- Pannel 布局模式 ---
+    # --- Panel 布局模式 ---
 
-    def ribbonPannelLayoutMode(self) -> int:
-        return self._defaultPannelLayoutMode
+    def ribbonPanelLayoutMode(self) -> int:
+        return self._defaultPanelLayoutMode
 
-    def setRibbonPannelLayoutMode(self, m: int):
-        if self._defaultPannelLayoutMode == m:
+    def setRibbonPanelLayoutMode(self, m: int):
+        if self._defaultPanelLayoutMode == m:
             return
-        self._defaultPannelLayoutMode = m
-        for p in self.pannelList():
-            p.setPannelLayoutMode(m)
+        self._defaultPanelLayoutMode = m
+        for p in self.panelList():
+            p.setPanelLayoutMode(m)
         self._layout.invalidate()
 
-    # --- Pannel 管理 ---
+    # --- Panel 管理 ---
 
-    def addPannel(self, *_args):
+    def addPanel(self, *_args):
         """
-        addPannel(str) -> SARibbonPannel
-        addPannel(SARibbonPannel)
+        addPanel(str) -> SARibbonPanel
+        addPanel(SARibbonPanel)
         """
         if len(_args) < 1:
             return None
         if isinstance(_args[0], str):
-            return self.insertPannel(_args[0], self._layout.pannelCount())
+            return self.insertPanel(_args[0], self._layout.panelCount())
         else:
-            pannel: SARibbonPannel = _args[0]
-            self._insertPannelWidget(self._layout.pannelCount(), pannel)
+            panel: SARibbonPanel = _args[0]
+            self._insertPanelWidget(self._layout.panelCount(), panel)
 
-    def insertPannel(self, title: str, index: int) -> SARibbonPannel:
-        pannel = SARibbonPannel(self)
-        pannel.setWindowTitle(title)
-        pannel.setObjectName(title)
-        pannel.setPannelLayoutMode(self._defaultPannelLayoutMode)
-        pannel.installEventFilter(self)
-        pannel.setVisible(True)
-        self._insertPannelWidget(index, pannel)
-        return pannel
+    def insertPanel(self, title: str, index: int) -> SARibbonPanel:
+        panel = SARibbonPanel(self)
+        panel.setWindowTitle(title)
+        panel.setObjectName(title)
+        panel.setPanelLayoutMode(self._defaultPanelLayoutMode)
+        panel.installEventFilter(self)
+        panel.setVisible(True)
+        self._insertPanelWidget(index, panel)
+        return panel
 
-    def _insertPannelWidget(self, index: int, pannel: SARibbonPannel):
-        if not pannel:
+    def _insertPanelWidget(self, index: int, panel: SARibbonPanel):
+        if not panel:
             return
-        if pannel.parentWidget() != self:
-            pannel.setParent(self)
-        self._layout.insertPannel(index, pannel)
+        if panel.parentWidget() != self:
+            panel.setParent(self)
+        self._layout.insertPanel(index, panel)
 
-    def pannelByName(self, title: str) -> Union[SARibbonPannel, None]:
-        for p in self.pannelList():
+    def panelByName(self, title: str) -> Union[SARibbonPanel, None]:
+        for p in self.panelList():
             if p.windowTitle() == title:
                 return p
         return None
 
-    def pannelByObjectName(self, objname: str) -> Union[SARibbonPannel, None]:
-        for p in self.pannelList():
+    def panelByObjectName(self, objname: str) -> Union[SARibbonPanel, None]:
+        for p in self.panelList():
             if p.objectName() == objname:
                 return p
         return None
 
-    def pannelByIndex(self, index: int) -> Union[SARibbonPannel, None]:
-        return self._layout.pannelAt(index)
+    def panelByIndex(self, index: int) -> Union[SARibbonPanel, None]:
+        return self._layout.panelAt(index)
 
-    def pannelIndex(self, p: SARibbonPannel) -> int:
-        return self._layout.pannelIndex(p)
+    def panelIndex(self, p: SARibbonPanel) -> int:
+        return self._layout.panelIndex(p)
 
-    def movePannel(self, fr: int, to: int):
-        self._layout.movePannel(fr, to)
+    def movePanel(self, fr: int, to: int):
+        self._layout.movePanel(fr, to)
 
-    def takePannel(self, p: SARibbonPannel) -> bool:
-        return self._layout.takePannel(p)
+    def takePanel(self, p: SARibbonPanel) -> bool:
+        return self._layout.takePanel(p)
 
-    def removePannel(self, *_args) -> bool:
+    def removePanel(self, *_args) -> bool:
         """
-        removePannel(SARibbonPannel) -> bool
-        removePannel(int) -> bool
+        removePanel(SARibbonPanel) -> bool
+        removePanel(int) -> bool
         """
         if len(_args) < 1:
             return False
         if isinstance(_args[0], int):
-            p = self.pannelByIndex(_args[0])
+            p = self.panelByIndex(_args[0])
             if not p:
                 return False
-            return self.removePannel(p)
-        pannel: SARibbonPannel = _args[0]
-        if self._layout.takePannel(pannel):
-            pannel.hide()
-            pannel.deleteLater()
+            return self.removePanel(p)
+        panel: SARibbonPanel = _args[0]
+        if self._layout.takePanel(panel):
+            panel.hide()
+            panel.deleteLater()
             return True
         return False
 
-    def pannelList(self) -> List[SARibbonPannel]:
-        return self._layout.pannelList()
+    def panelList(self) -> List[SARibbonPanel]:
+        return self._layout.panelList()
 
-    def pannelCount(self) -> int:
-        return self._layout.pannelCount()
+    def panelCount(self) -> int:
+        return self._layout.panelCount()
 
     # --- 背景 ---
 
@@ -175,7 +175,7 @@ class SARibbonCategory(QWidget):
         return super().event(e)
 
     def wheelEvent(self, e):
-        """在超出边界情况下，滚轮可滚动pannel"""
+        """在超出边界情况下，滚轮可滚动panel"""
         contentWidth = self._layout._contentSize().width()
         totalWidth = self._layout.totalWidth
         if totalWidth > contentWidth:
@@ -222,13 +222,13 @@ if __name__ == '__main__':
 
     app = QApplication([])
     mainWindow = SARibbonCategory()
-    pannel = mainWindow.addPannel('Panel 1')
+    panel = mainWindow.addPanel('Panel 1')
 
     act = QAction(mainWindow)
     act.setObjectName('Save')
     act.setText('Save')
     act.setIcon(QIcon('resource/icon/save.png'))
-    pannel.addLargeAction(act)
+    panel.addLargeAction(act)
 
     mainWindow.setMinimumWidth(500)
     mainWindow.show()

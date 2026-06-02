@@ -11,7 +11,7 @@ SARibbonBar{
 }
 
 
-/*SARibbonButtonGroupWidget,SARibbonSystemButtonBar和RightButtonGroup都是使用此控件，pannel里面的按钮组也是使用此控件*/
+/*SARibbonButtonGroupWidget,SARibbonSystemButtonBar和RightButtonGroup都是使用此控件，panel里面的按钮组也是使用此控件*/
 SARibbonButtonGroupWidget{
   background-color: transparent;
 }
@@ -76,28 +76,28 @@ SARibbonCategory:focus {
   outline: none;
 }
 
-/*SARibbonPannel*/
+/*SARibbonPanel*/
 
-SARibbonPannel {
+SARibbonPanel {
   background-color: transparent;
   border: none;
 }
 
-/*SARibbonPannel Panel下标题栏*/
+/*SARibbonPanel Panel下标题栏*/
 
-SARibbonPannel {
+SARibbonPanel {
     background-color: transparent;
     color: #242424;
 }
 
-/*SARibbonPannelOptionButton*/
-SARibbonPannelOptionButton {
+/*SARibbonPanelOptionButton*/
+SARibbonPanelOptionButton {
   border:none;
   background-color: transparent;
   color:#242424;
 }
 
-SARibbonPannelOptionButton:hover {
+SARibbonPanelOptionButton:hover {
   background-color:#a0a0a0;
 }
 
@@ -257,48 +257,48 @@ SARibbonGalleryViewport {
 }
 
 /*Panel下QLineEdit的特化*/
-SARibbonPannel > QLineEdit {
+SARibbonPanel > QLineEdit {
   border:1px solid #888888;
   background-color: white;
   color: #242424;
   selection-background-color: #6a9eff;
   selection-color: white;
 }
-SARibbonPannel > QLineEdit:hover{
+SARibbonPanel > QLineEdit:hover{
     border: 1px solid #cfcecc;
 }
 /*Panel下QCheckBox的特化*/
-SARibbonPannel > QCheckBox{
+SARibbonPanel > QCheckBox{
     color:#242424;
     background-color:transparent;
 }
 
 /*Panel下QComboBox的特化*/
-SARibbonPannel > QComboBox {
+SARibbonPanel > QComboBox {
   border: 1px  solid #888888;
   background-color: white;
 }
-SARibbonPannel > QComboBox:hover{
+SARibbonPanel > QComboBox:hover{
   border: 1px solid #cfcecc;
   color : #242424;
 }
-SARibbonPannel > QComboBox:editable {
+SARibbonPanel > QComboBox:editable {
   color : #242424;
   background-color: white;
   selection-background-color: #6a9eff;
   selection-color: white;
 }
-SARibbonPannel > QComboBox::drop-down {
+SARibbonPanel > QComboBox::drop-down {
   subcontrol-origin: padding;
   subcontrol-position: top right;
   width: 1em;
   border: none;
 }
-SARibbonPannel > QComboBox::drop-down:hover {
+SARibbonPanel > QComboBox::drop-down:hover {
   border: none;
   background-color: #a0a0a0;
 }
-SARibbonPannel > QComboBox::down-arrow {
+SARibbonPanel > QComboBox::down-arrow {
   image: url(:/SARibbon/image/resource/ArrowDown.png);
 }
 

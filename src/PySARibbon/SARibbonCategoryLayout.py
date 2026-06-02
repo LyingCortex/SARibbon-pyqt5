@@ -3,7 +3,7 @@
 @Module     SARibbonCategoryLayout
 @Author     ROOT
 
-@brief SARibbonCategory的布局管理器，负责管理pannel的水平排列和滚动
+@brief SARibbonCategory的布局管理器，负责管理panel的水平排列和滚动
 """
 from typing import List, Union
 from .compat import QRect, QSize, QMargins, Qt, QLayout, QLayoutItem, QWidget, QWidgetItem
@@ -14,16 +14,16 @@ from .SATools.SARibbonElementManager import RibbonSubElementDelegate
 
 
 class SARibbonCategoryLayoutItem(QWidgetItem):
-    """布局项，包含pannel和对应的分割线"""
-    def __init__(self, pannel: QWidget):
-        super().__init__(pannel)
+    """布局项，包含panel和对应的分割线"""
+    def __init__(self, panel: QWidget):
+        super().__init__(panel)
         self.separatorWidget: SARibbonSeparatorWidget = None
         self.mWillSetGeometry = QRect()
         self.mWillSetSeparatorGeometry = QRect()
 
 
 class SARibbonCategoryLayout(QLayout):
-    """SARibbonCategory的布局管理器，负责pannel的水平排列和滚动"""
+    """SARibbonCategory的布局管理器，负责panel的水平排列和滚动"""
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -63,21 +63,21 @@ class SARibbonCategoryLayout(QLayout):
     def rightScrollButton(self) -> SARibbonCategoryScrollButton:
         return self._rightScrollBtn
 
-    # --- Pannel 管理 ---
+    # --- Panel 管理 ---
 
-    def addPannel(self, pannel: QWidget):
-        self.insertPannel(len(self._items), pannel)
+    def addPanel(self, panel: QWidget):
+        self.insertPanel(len(self._items), panel)
 
-    def insertPannel(self, index: int, pannel: QWidget):
+    def insertPanel(self, index: int, panel: QWidget):
         index = max(0, min(index, len(self._items)))
-        item = SARibbonCategoryLayoutItem(pannel)
+        item = SARibbonCategoryLayoutItem(panel)
         item.separatorWidget = RibbonSubElementDelegate.createRibbonSeparatorWidget(self.parentWidget())
         self._items.insert(index, item)
         self.invalidate()
 
-    def takePannel(self, pannel: QWidget) -> bool:
+    def takePanel(self, panel: QWidget) -> bool:
         for i, item in enumerate(self._items):
-            if item.widget() == pannel:
+            if item.widget() == panel:
                 self._items.pop(i)
                 if item.separatorWidget:
                     item.separatorWidget.hide()
@@ -86,24 +86,24 @@ class SARibbonCategoryLayout(QLayout):
                 return True
         return False
 
-    def pannelList(self) -> List[QWidget]:
+    def panelList(self) -> List[QWidget]:
         return [item.widget() for item in self._items]
 
-    def pannelCount(self) -> int:
+    def panelCount(self) -> int:
         return len(self._items)
 
-    def pannelAt(self, index: int) -> Union[QWidget, None]:
+    def panelAt(self, index: int) -> Union[QWidget, None]:
         if 0 <= index < len(self._items):
             return self._items[index].widget()
         return None
 
-    def pannelIndex(self, pannel: QWidget) -> int:
+    def panelIndex(self, panel: QWidget) -> int:
         for i, item in enumerate(self._items):
-            if item.widget() == pannel:
+            if item.widget() == panel:
                 return i
         return -1
 
-    def movePannel(self, fr: int, to: int):
+    def movePanel(self, fr: int, to: int):
         if fr == to:
             return
         to = max(0, min(to, len(self._items) - 1))
@@ -114,7 +114,7 @@ class SARibbonCategoryLayout(QLayout):
     # --- QLayout 接口 ---
 
     def addItem(self, item: QLayoutItem):
-        pass  # 使用 addPannel 代替
+        pass  # 使用 addPanel 代替
 
     def itemAt(self, index: int) -> Union[QLayoutItem, None]:
         if 0 <= index < len(self._items):

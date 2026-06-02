@@ -20,7 +20,7 @@ SARibbonBar{
 }
 
 
-/*SARibbonButtonGroupWidget,SARibbonSystemButtonBar和RightButtonGroup都是使用此控件，pannel里面的按钮组也是使用此控件*/
+/*SARibbonButtonGroupWidget,SARibbonSystemButtonBar和RightButtonGroup都是使用此控件，panel里面的按钮组也是使用此控件*/
 SARibbonButtonGroupWidget{
   background-color: transparent;
 }
@@ -97,9 +97,9 @@ SARibbonCategory > SARibbonSeparatorWidget {
   color: transparent;
 }
 
-/*SARibbonPannel*/
+/*SARibbonPanel*/
 
-SARibbonPannel {
+SARibbonPanel {
   background-color: #344253;
   border: none;
 }
@@ -108,24 +108,24 @@ SARibbonPannel {
 SARibbonPanel下的SARibbonSeparatorWidget
 注意，SARibbonSeparatorWidget的背景颜色是使用color
 */
-SARibbonPannel > SARibbonSeparatorWidget {
+SARibbonPanel > SARibbonSeparatorWidget {
   color: #5d636a;
 }
 
-/*SARibbonPannel Panel下标题栏*/
-SARibbonPannel {
+/*SARibbonPanel Panel下标题栏*/
+SARibbonPanel {
     background-color: #4d5973;
     color: #dadada;
 }
 
-/*SARibbonPannelOptionButton*/
-SARibbonPannelOptionButton {
+/*SARibbonPanelOptionButton*/
+SARibbonPanelOptionButton {
   border:none;
   background-color: transparent;
   color:#dadada;
 }
 
-SARibbonPannelOptionButton:hover {
+SARibbonPanelOptionButton:hover {
   background-color:#375d77;
 }
 
@@ -280,55 +280,55 @@ SARibbonGalleryViewport {
 }
 
 /*Panel下QLineEdit的特化*/
-SARibbonPannel > QLineEdit {
+SARibbonPanel > QLineEdit {
   border:1px solid #192430;
   background-color: #4d5973;
   color: #dadada;
   selection-background-color: #2a8db5;
   selection-color: #dadada;
 }
-SARibbonPannel > QLineEdit:hover{
+SARibbonPanel > QLineEdit:hover{
     border: 1px solid #2a8db5;
 }
 
 /*Panel下QCheckBox的特化*/
-SARibbonPannel > QCheckBox{
+SARibbonPanel > QCheckBox{
     color:#dadada;
     background-color:transparent;
 }
 
 /*Panel下QRadioButton的特化*/
-SARibbonPannel > QRadioButton{
+SARibbonPanel > QRadioButton{
     color:#dadada;
     background-color:transparent;
 }
 
 /*Panel下QComboBox的特化*/
-SARibbonPannel > QComboBox {
+SARibbonPanel > QComboBox {
   color : #dadada;
   border: 1px solid #192430;
   background-color: #344253;
 }
-SARibbonPannel > QComboBox:hover{
+SARibbonPanel > QComboBox:hover{
   border: 1px solid #2a8db5;
 }
-SARibbonPannel > QComboBox:editable {
+SARibbonPanel > QComboBox:editable {
   color : #dadada;
   background-color: #4d5973;
   selection-background-color: #2a8db5;
   selection-color: #dadada;
 }
-SARibbonPannel > QComboBox::drop-down {
+SARibbonPanel > QComboBox::drop-down {
   subcontrol-origin: padding;
   subcontrol-position: top right;
   width: 1em;
   border: none;
 }
-SARibbonPannel > QComboBox::drop-down:hover {
+SARibbonPanel > QComboBox::drop-down:hover {
   border: none;
   background-color: #2a8db5;
 }
-SARibbonPannel > QComboBox::down-arrow {
+SARibbonPanel > QComboBox::down-arrow {
   image: url(:/SARibbon/image/resource/ArrowDown.png);
 }
 

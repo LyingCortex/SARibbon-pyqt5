@@ -11,36 +11,36 @@ from typing import List
 
 from ..compat import QObject, QWidget
 
-from PySARibbon.SAWidgets import SARibbonPannelItem
+from PySARibbon.SAWidgets import SARibbonPanelItem
 from PySARibbon.SATools.SARibbonGlobal import SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE
 
 
 class SARibbonCustomizeData(object):
     def __init__(self, tp=0, mgr=None):
-        # 标记这个data是category还是pannel亦或是action
+        # 标记这个data是category还是panel亦或是action
         self.m_type = tp
         self.m_actionsManagerPointer: QWidget = mgr
 
         """
        @brief 记录顺序的参数
        在actionType==AddCategoryActionType时，此参数记录Category的insert位置,
-       在actionType==AddPannelActionType时，此参数记录pannel的insert位置,
-       在actionType==AddActionActionType时，此参数记录pannel的insert位置
+       在actionType==AddPanelActionType时，此参数记录panel的insert位置,
+       在actionType==AddActionActionType时，此参数记录panel的insert位置
        """
         self.indexValue = -1
         """
        @brief 记录标题、索引等参数
        在actionType==AddCategoryActionType时，key为category标题，
-       在actionType==AddPannelActionType时，key为pannel标题，
+       在actionType==AddPanelActionType时，key为panel标题，
        在actionType==AddActionActionType时，key为action的查询依据，基于SARibbonActionsManager::action查询
        """
         self.keyValue = ''
         """@brief 记录categoryObjName，用于定位Category"""
         self.categoryObjNameValue = ''
-        """@brief 记录pannelObjName，saribbon的Customize索引大部分基于objname"""
-        self.pannelObjNameValue = ''
+        """@brief 记录panelObjName，saribbon的Customize索引大部分基于objname"""
+        self.panelObjNameValue = ''
         # 行的占比，ribbon中有large，media和small三种占比,见@ref RowProportion
-        self.actionRowProportionValue: int = SARibbonPannelItem.RPLarge
+        self.actionRowProportionValue: int = SARibbonPanelItem.RPLarge
 
     def actionType(self) -> int:
         """获取CustomizeData的action type"""
@@ -70,12 +70,12 @@ class SARibbonCustomizeData(object):
             c.setObjectName(self.categoryObjNameValue)
             self.setCanCustomize(c)
             return True
-        elif tp == self.AddPannelActionType:
+        elif tp == self.AddPanelActionType:
             c = bar.categoryByObjectName(self.categoryObjNameValue)
             if not c:
                 return False
-            p = c.insertPannel(self.keyValue, self.indexValue)
-            p.setObjectName(self.pannelObjNameValue)
+            p = c.insertPanel(self.keyValue, self.indexValue)
+            p.setObjectName(self.panelObjNameValue)
             self.setCanCustomize(p)
             return True
         elif tp == self.AddActionActionType:
@@ -84,7 +84,7 @@ class SARibbonCustomizeData(object):
             c = bar.categoryByObjectName(self.categoryObjNameValue)
             if not c:
                 return False
-            p = c.pannelByObjectName(self.pannelObjNameValue)
+            p = c.panelByObjectName(self.panelObjNameValue)
             if not p:
                 return False
             act = self.m_actionsManagerPointer.action(self.keyValue)
@@ -99,20 +99,20 @@ class SARibbonCustomizeData(object):
                 return False
             bar.removeCategory(c)
             return True
-        elif tp == self.RemovePannelActionType:
+        elif tp == self.RemovePanelActionType:
             c = bar.categoryByObjectName(self.categoryObjNameValue)
             if not c:
                 return False
-            p = c.pannelByObjectName(self.pannelObjNameValue)
+            p = c.panelByObjectName(self.panelObjNameValue)
             if not p:
                 return False
-            c.removePannel(p)
+            c.removePanel(p)
             return True
         elif tp == self.RemoveActionActionType:
             c = bar.categoryByObjectName(self.categoryObjNameValue)
             if not c:
                 return False
-            p = c.pannelByObjectName(self.pannelObjNameValue)
+            p = c.panelByObjectName(self.panelObjNameValue)
             if not p:
                 return False
             act = self.m_actionsManagerPointer.action(self.keyValue)
@@ -129,23 +129,23 @@ class SARibbonCustomizeData(object):
                 return False
             bar.moveCategory(currentIdx, currentIdx + self.indexValue)
             return True
-        elif tp == self.ChangePannelOrderActionType:
+        elif tp == self.ChangePanelOrderActionType:
             c = bar.categoryByObjectName(self.categoryObjNameValue)
             if not c:
                 return False
-            p = c.pannelByObjectName(self.pannelObjNameValue)
+            p = c.panelByObjectName(self.panelObjNameValue)
             if not p:
                 return False
-            pannelIdx = c.pannelIndex(p)
-            if pannelIdx == -1:
+            panelIdx = c.panelIndex(p)
+            if panelIdx == -1:
                 return False
-            c.movePannel(pannelIdx, pannelIdx + self.indexValue)
+            c.movePanel(panelIdx, panelIdx + self.indexValue)
             return True
         elif tp == self.ChangeActionOrderActionType:
             c = bar.categoryByObjectName(self.categoryObjNameValue)
             if not c:
                 return False
-            p = c.pannelByObjectName(self.pannelObjNameValue)
+            p = c.panelByObjectName(self.panelObjNameValue)
             if not p:
                 return False
             act = self.m_actionsManagerPointer.action(self.keyValue)
@@ -162,11 +162,11 @@ class SARibbonCustomizeData(object):
                 return False
             c.setWindowTitle(self.keyValue)
             return True
-        elif tp == self.RenamePannelActionType:
+        elif tp == self.RenamePanelActionType:
             c = bar.categoryByObjectName(self.categoryObjNameValue)
             if not c:
                 return False
-            p = c.pannelByObjectName(self.pannelObjNameValue)
+            p = c.panelByObjectName(self.panelObjNameValue)
             if not p:
                 return False
             p.setWindowTitle(self.keyValue)
@@ -201,22 +201,22 @@ class SARibbonCustomizeData(object):
         return d
 
     @classmethod
-    def makeAddPannelCustomizeData(cls, title: str, index: int, categoryobjName: str, objName: str) -> object:
-        """创建一个AddPannelActionType的SARibbonCustomizeData"""
-        d = SARibbonCustomizeData(cls.AddPannelActionType)
+    def makeAddPanelCustomizeData(cls, title: str, index: int, categoryobjName: str, objName: str) -> object:
+        """创建一个AddPanelActionType的SARibbonCustomizeData"""
+        d = SARibbonCustomizeData(cls.AddPanelActionType)
         d.indexValue = index
         d.keyValue = title
-        d.pannelObjNameValue = objName
+        d.panelObjNameValue = objName
         d.categoryObjNameValue = categoryobjName
         return d
 
     @classmethod
     def makeAddActionCustomizeData(cls, key: str,  mgr: QWidget, rp: int,
-                                   categoryobjName: str, pannelObjName: str) -> object:
+                                   categoryobjName: str, panelObjName: str) -> object:
         """添加action"""
         d = SARibbonCustomizeData(cls.AddActionActionType, mgr)
         d.keyValue = key
-        d.pannelObjNameValue = pannelObjName
+        d.panelObjNameValue = panelObjName
         d.categoryObjNameValue = categoryobjName
         d.actionRowProportionValue = rp
         return d
@@ -233,15 +233,15 @@ class SARibbonCustomizeData(object):
         return d
 
     @classmethod
-    def makeRenamePannelCustomizeData(cls, newname: str, categoryobjName: str, pannelObjName: str) -> object:
-        """创建一个RenamePannelActionType的SARibbonCustomizeData"""
-        d = SARibbonCustomizeData(cls.RenamePannelActionType)
-        if not categoryobjName or not pannelObjName:
+    def makeRenamePanelCustomizeData(cls, newname: str, categoryobjName: str, panelObjName: str) -> object:
+        """创建一个RenamePanelActionType的SARibbonCustomizeData"""
+        d = SARibbonCustomizeData(cls.RenamePanelActionType)
+        if not categoryobjName or not panelObjName:
             print("SARibbon Warning !!! customize rename category, but get an empty category object name,"
                   "if you want to customize SARibbon, please make sure every element has been set object name.")
         d.keyValue = newname
         d.categoryObjNameValue = categoryobjName
-        d.pannelObjNameValue = pannelObjName
+        d.panelObjNameValue = panelObjName
         return d
 
     @classmethod
@@ -256,27 +256,27 @@ class SARibbonCustomizeData(object):
         return d
 
     @classmethod
-    def makeChangePannelOrderCustomizeData(cls, categoryobjName: str, pannelObjName: str, moveIndex: int) -> object:
-        """对应ChangePannelOrderActionType"""
-        d = SARibbonCustomizeData(cls.ChangePannelOrderActionType)
-        if not categoryobjName or not pannelObjName:
+    def makeChangePanelOrderCustomizeData(cls, categoryobjName: str, panelObjName: str, moveIndex: int) -> object:
+        """对应ChangePanelOrderActionType"""
+        d = SARibbonCustomizeData(cls.ChangePanelOrderActionType)
+        if not categoryobjName or not panelObjName:
             print("SARibbon Warning !!! customize rename category, but get an empty category object name,"
                   "if you want to customize SARibbon, please make sure every element has been set object name.")
         d.categoryObjNameValue = categoryobjName
-        d.pannelObjNameValue = pannelObjName
+        d.panelObjNameValue = panelObjName
         d.indexValue = moveIndex
         return d
 
     @classmethod
-    def makeChangeActionOrderCustomizeData(cls, categoryobjName: str, pannelObjName: str,
+    def makeChangeActionOrderCustomizeData(cls, categoryobjName: str, panelObjName: str,
                                            key: str, mgr: QWidget, moveIndex: int) -> object:
         """对应ChangeActionOrderActionType"""
         d = SARibbonCustomizeData(cls.ChangeActionOrderActionType, mgr)
-        if not categoryobjName or not pannelObjName:
+        if not categoryobjName or not panelObjName:
             print("SARibbon Warning !!! customize rename category, but get an empty category object name,"
                   "if you want to customize SARibbon, please make sure every element has been set object name.")
         d.categoryObjNameValue = categoryobjName
-        d.pannelObjNameValue = pannelObjName
+        d.panelObjNameValue = panelObjName
         d.keyValue = key
         d.indexValue = moveIndex
         return d
@@ -292,25 +292,25 @@ class SARibbonCustomizeData(object):
         return d
 
     @classmethod
-    def makeRemovePannelCustomizeData(cls, categoryobjName: str, pannelObjName: str) -> object:
-        """对应RemovePannelActionType"""
-        d = SARibbonCustomizeData(cls.RemovePannelActionType)
-        if not categoryobjName or not pannelObjName:
+    def makeRemovePanelCustomizeData(cls, categoryobjName: str, panelObjName: str) -> object:
+        """对应RemovePanelActionType"""
+        d = SARibbonCustomizeData(cls.RemovePanelActionType)
+        if not categoryobjName or not panelObjName:
             print("SARibbon Warning !!! customize rename category, but get an empty category object name,"
                   "if you want to customize SARibbon, please make sure every element has been set object name.")
         d.categoryObjNameValue = categoryobjName
-        d.pannelObjNameValue = pannelObjName
+        d.panelObjNameValue = panelObjName
         return d
 
     @classmethod
-    def makeRemoveActionCustomizeData(cls, categoryobjName: str, pannelObjName: str, key: str, mgr: QWidget) -> object:
+    def makeRemoveActionCustomizeData(cls, categoryobjName: str, panelObjName: str, key: str, mgr: QWidget) -> object:
         """对应RemoveActionActionType"""
         d = SARibbonCustomizeData(cls.RemoveActionActionType, mgr)
-        if not categoryobjName or not pannelObjName:
+        if not categoryobjName or not panelObjName:
             print("SARibbon Warning !!! customize rename category, but get an empty category object name,"
                   "if you want to customize SARibbon, please make sure every element has been set object name.")
         d.categoryObjNameValue = categoryobjName
-        d.pannelObjNameValue = pannelObjName
+        d.panelObjNameValue = panelObjName
         d.keyValue = key
         return d
 
@@ -340,10 +340,10 @@ class SARibbonCustomizeData(object):
     def simplify(cls, csd: List) -> List:
         """对List[SARibbonCustomizeData]进行简化操作
          *此函数会执行如下操作：
-         1、针对同一个category/pannel连续出现的添加和删除操作进行移除（前一步添加，后一步删除）
+         1、针对同一个category/panel连续出现的添加和删除操作进行移除（前一步添加，后一步删除）
          2、针对VisibleCategoryActionType，对于连续出现的操作只保留最后一步
-         3、针对RenameCategoryActionType和RenamePannelActionType操作，只保留最后一个
-         4、针对连续的ChangeCategoryOrderActionType，ChangePannelOrderActionType，
+         3、针对RenameCategoryActionType和RenamePanelActionType操作，只保留最后一个
+         4、针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，
             ChangeActionOrderActionType进行合并为一个动作，如果合并后原地不动，则删除
         """
         size = len(csd)
@@ -358,16 +358,16 @@ class SARibbonCustomizeData(object):
                 if csd[i-1].categoryObjNameValue == csd[i].categoryObjNameValue:
                     willremoveIndex.append(i-1)
                     willremoveIndex.append(i)
-            elif (csd[i-1].actionType() == cls.AddPannelActionType and
-                   csd[i].actionType() == cls.RemovePannelActionType):
+            elif (csd[i-1].actionType() == cls.AddPanelActionType and
+                   csd[i].actionType() == cls.RemovePanelActionType):
                 if (csd[i-1].categoryObjNameValue == csd[i].categoryObjNameValue and
-                     csd[i-1].pannelObjNameValue == csd[i].pannelObjNameValue):
+                     csd[i-1].panelObjNameValue == csd[i].panelObjNameValue):
                     willremoveIndex.append(i-1)
                     willremoveIndex.append(i)
             elif (csd[i-1].actionType() == cls.AddActionActionType and
                    csd[i].actionType() == cls.RemoveActionActionType):
                 if (csd[i-1].categoryObjNameValue == csd[i].categoryObjNameValue and
-                     csd[i-1].pannelObjNameValue == csd[i].pannelObjNameValue and
+                     csd[i-1].panelObjNameValue == csd[i].panelObjNameValue and
                      csd[i-1].keyValue == csd[i].keyValue):
                     willremoveIndex.append(i-1)
                     willremoveIndex.append(i)
@@ -385,7 +385,7 @@ class SARibbonCustomizeData(object):
         res = cls.remove_indexs(res, willremoveIndex)
         willremoveIndex.clear()
 
-        # 针对RenameCategoryActionType和RenamePannelActionType操作，只需保留最后一个
+        # 针对RenameCategoryActionType和RenamePanelActionType操作，只需保留最后一个
         for i, val in enumerate(res):
             if val.actionType() == cls.RenameCategoryActionType:
                 # 向后查询，如果查询到有同一个Category改名，把这个索引加入删除队列
@@ -393,17 +393,17 @@ class SARibbonCustomizeData(object):
                     if (v.actionType() == val.actionType() and
                          v.categoryObjNameValue == val.categoryObjNameValue):
                         willremoveIndex.append(i)
-            elif val.actionType() == cls.RenamePannelActionType:
-                # 向后查询，如果查询到有同一个pannel改名，把这个索引加入删除队列
+            elif val.actionType() == cls.RenamePanelActionType:
+                # 向后查询，如果查询到有同一个panel改名，把这个索引加入删除队列
                 for v in res[i+1:]:
                     if (v.actionType() == val.actionType() and
                          v.categoryObjNameValue == val.categoryObjNameValue and
-                         v.pannelObjNameValue == val.pannelObjNameValue):
+                         v.panelObjNameValue == val.panelObjNameValue):
                         willremoveIndex.append(i)
         res = cls.remove_indexs(res, willremoveIndex)
         willremoveIndex.clear()
 
-        # 针对连续的ChangeCategoryOrderActionType，ChangePannelOrderActionType，ChangeActionOrderActionType进行合并
+        # 针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，ChangeActionOrderActionType进行合并
         size = len(res)
         for i in range(1, size):
             if (res[i-1].actionType() == cls.ChangeCategoryOrderActionType and
@@ -412,17 +412,17 @@ class SARibbonCustomizeData(object):
                     # 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
                     res[i].indexValue += res[i-1].indexValue
                     willremoveIndex.append(i-1)
-            elif (res[i-1].actionType() == cls.ChangePannelOrderActionType and
-                   res[i].actionType() == cls.ChangePannelOrderActionType):
+            elif (res[i-1].actionType() == cls.ChangePanelOrderActionType and
+                   res[i].actionType() == cls.ChangePanelOrderActionType):
                 if (res[i-1].categoryObjNameValue == res[i].categoryObjNameValue and
-                     res[i-1].pannelObjNameValue == res[i].pannelObjNameValue):
+                     res[i-1].panelObjNameValue == res[i].panelObjNameValue):
                     # 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
                     res[i].indexValue += res[i - 1].indexValue
                     willremoveIndex.append(i-1)
             elif (res[i-1].actionType() == cls.ChangeActionOrderActionType and
                    res[i].actionType() == cls.ChangeActionOrderActionType):
                 if (res[i-1].categoryObjNameValue == res[i].categoryObjNameValue and
-                     res[i-1].pannelObjNameValue == res[i].pannelObjNameValue and
+                     res[i-1].panelObjNameValue == res[i].panelObjNameValue and
                      res[i-1].keyValue == res[i].keyValue):
                     res[i].indexValue += res[i - 1].indexValue
                     willremoveIndex.append(i-1)
@@ -432,7 +432,7 @@ class SARibbonCustomizeData(object):
         # 上一步操作可能会产生indexvalue为0的情况，此操作把indexvalue为0的删除
         for i, val in enumerate(res):
             if (val.actionType() == cls.ChangeCategoryOrderActionType or
-                        val.actionType() == cls.ChangePannelOrderActionType or
+                        val.actionType() == cls.ChangePanelOrderActionType or
                         val.actionType() == cls.ChangeActionOrderActionType):
                 if val.indexValue == 0:
                     willremoveIndex.append(i)
@@ -447,14 +447,14 @@ class SARibbonCustomizeData(object):
     # 自定义变量
     UnknowActionType = 0            # 未知操作
     AddCategoryActionType = 1       # 添加category操作(1)
-    AddPannelActionType = 2         # 添加pannel操作(2)
+    AddPanelActionType = 2         # 添加panel操作(2)
     AddActionActionType = 3         # 添加action操作(3)
     RemoveCategoryActionType = 4    # 删除category操作(4)
-    RemovePannelActionType = 5      # 删除pannel操作(5)
+    RemovePanelActionType = 5      # 删除panel操作(5)
     RemoveActionActionType = 6      # 删除action操作(6)
     ChangeCategoryOrderActionType = 7   # 改变category顺序的操作(7)
-    ChangePannelOrderActionType = 8     # 改变pannel顺序的操作(8)
+    ChangePanelOrderActionType = 8     # 改变panel顺序的操作(8)
     ChangeActionOrderActionType = 9     # 改变action顺序的操作(9)
     RenameCategoryActionType = 10   # 对category更名操作(10)
-    RenamePannelActionType = 11     # 对Pannel更名操作(11)
+    RenamePanelActionType = 11     # 对Panel更名操作(11)
     VisibleCategoryActionType = 12  # 对category执行隐藏/显示操作(12)

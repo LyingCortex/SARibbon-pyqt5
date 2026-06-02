@@ -10,9 +10,9 @@ from PyQt5.QtGui import QIcon, QKeySequence, QColor
 from PyQt5.QtWidgets import QApplication, QTextEdit, QStatusBar, QButtonGroup, QRadioButton, QToolButton, \
     QCalendarWidget, QSizePolicy, QMenu, QAction, QComboBox, QLineEdit, QCheckBox, QWidget
 
-from PySARibbon.SAWidgets import SARibbonMenu, SARibbonPannelItem
+from PySARibbon.SAWidgets import SARibbonMenu, SARibbonPanelItem
 from PySARibbon.SACustomize import SARibbonActionsManager, SARibbonCustomizeWidget, SARibbonCustomizeDialog
-from PySARibbon import SARibbonMainWindow, SARibbonBar, SARibbonCategory, SARibbonPannel, \
+from PySARibbon import SARibbonMainWindow, SARibbonBar, SARibbonCategory, SARibbonPanel, \
     SARibbonGallery, SARibbonButtonGroupWidget
 
 
@@ -101,7 +101,7 @@ class MainWindow(SARibbonMainWindow):
         self.setWindowIcon(QIcon('resource/icon/icon2.png'))
 
     def createCategoryMain(self, page: SARibbonCategory):
-        pannel = page.addPannel('Panel 1')
+        panel = page.addPanel('Panel 1')
         # act 1
         act = QAction(self)
         act.setObjectName('Save')
@@ -109,7 +109,7 @@ class MainWindow(SARibbonMainWindow):
         act.setToolTip('Save')
         act.setIcon(QIcon('resource/icon/save.png'))
         act.setShortcut(QKeySequence('Ctrl+S'))
-        pannel.addLargeAction(act)
+        panel.addLargeAction(act)
         act.triggered.connect(lambda b: self.m_edit.append('action clicked'))
         # act 2
         act = QAction(self)
@@ -117,7 +117,7 @@ class MainWindow(SARibbonMainWindow):
         act.setText('展示/隐藏 ribbon')
         act.setIcon(QIcon('resource/icon/filter.png'))
         act.setCheckable(True)
-        pannel.addSmallAction(act)
+        panel.addSmallAction(act)
         act.triggered.connect(lambda b: self.ribbonBar().setMinimumMode(b))
         # act 3
         act = QAction(self)
@@ -125,7 +125,7 @@ class MainWindow(SARibbonMainWindow):
         act.setText('显示操作ribbon按钮')
         act.setIcon(QIcon('resource/icon/information.png'))
         act.setCheckable(True)
-        pannel.addSmallAction(act)
+        panel.addSmallAction(act)
         act.triggered.connect(lambda b: self.ribbonBar().showMinimumModeButton(b))
         act.trigger()
 
@@ -134,35 +134,35 @@ class MainWindow(SARibbonMainWindow):
         r.setObjectName('use office style')
         r.setChecked(True)
         self.btnGroup.addButton(r, SARibbonBar.OfficeStyle)
-        pannel.addSmallWidget(r)
+        panel.addSmallWidget(r)
         r = QRadioButton('use wps style', self)
         r.setObjectName('use wps style')
         r.setChecked(False)
         self.btnGroup.addButton(r, SARibbonBar.WpsLiteStyle)
-        pannel.addSmallWidget(r)
+        panel.addSmallWidget(r)
         r = QRadioButton('use office 2row style', self)
         r.setObjectName('use office 2row style')
         r.setChecked(False)
         self.btnGroup.addButton(r, SARibbonBar.OfficeStyleTwoRow)
-        pannel.addSmallWidget(r)
+        panel.addSmallWidget(r)
         r = QRadioButton('use wps 2row style', self)
         r.setObjectName('use wps 2row style')
         r.setChecked(False)
         self.btnGroup.addButton(r, SARibbonBar.WpsLiteStyleTwoRow)
-        pannel.addSmallWidget(r)
+        panel.addSmallWidget(r)
         r = QRadioButton('use office single row', self)
         r.setObjectName('use office single row')
         r.setChecked(False)
         self.btnGroup.addButton(r, SARibbonBar.OfficeStyleSingleRow)
-        pannel.addSmallWidget(r)
+        panel.addSmallWidget(r)
         r = QRadioButton('use wps single row', self)
         r.setObjectName('use wps single row')
         r.setChecked(False)
         self.btnGroup.addButton(r, SARibbonBar.WpsLiteStyleSingleRow)
-        pannel.addSmallWidget(r)
+        panel.addSmallWidget(r)
         self.btnGroup.buttonClicked[int].connect(self.onStyleClicked)
 
-        pannel.addSeparator()   # 分割线
+        panel.addSeparator()   # 分割线
 
         menu = SARibbonMenu(self)
         a = menu.addAction(QIcon('resource/icon/folder.png'), 'item 1')
@@ -189,35 +189,35 @@ class MainWindow(SARibbonMainWindow):
         act = QAction(QIcon('resource/icon/folder.png'), 'test 1', self)
         act.setObjectName('test 1')
         act.setMenu(menu)
-        btn = pannel.addSmallAction(act)
+        btn = panel.addSmallAction(act)
         btn.setPopupMode(QToolButton.MenuButtonPopup)
         act = QAction(QIcon('resource/icon/folder.png'), 'test 2', self)
         act.setObjectName('test 2')
         act.setMenu(menu)
-        btn = pannel.addSmallAction(act)
+        btn = panel.addSmallAction(act)
         btn.setPopupMode(QToolButton.InstantPopup)
 
-        pannel.addSeparator()  # 分割线
+        panel.addSeparator()  # 分割线
 
         act = QAction(QIcon('resource/icon/folder.png'), 'DelayedPopup', self)
         act.setObjectName('DelayedPopup')
         act.setMenu(menu)
         act.triggered.connect(self.onDelayedPopupCheckabletriggered)
-        btn = pannel.addLargeAction(act)
+        btn = panel.addLargeAction(act)
         btn.setObjectName('SA_DelayedPopup')
         btn.setPopupMode(QToolButton.DelayedPopup)
         act = QAction(QIcon('resource/icon/folder.png'), 'MenuButtonPopup', self)
         act.setObjectName('MenuButtonPopup')
         act.setMenu(menu)
         act.triggered.connect(self.onMenuButtonPopupCheckabletriggered)
-        btn = pannel.addLargeAction(act)
+        btn = panel.addLargeAction(act)
         btn.setObjectName('SA_MenuButtonPopup')
         btn.setPopupMode(QToolButton.MenuButtonPopup)
         act = QAction(QIcon('resource/icon/Graph-add.png'), 'InstantPopup', self)
         act.setObjectName('InstantPopup')
         act.setMenu(menu)
         act.triggered.connect(self.onInstantPopupCheckabletriggered)
-        btn = pannel.addLargeAction(act)
+        btn = panel.addLargeAction(act)
         btn.setObjectName('SA_InstantPopup')
         btn.setPopupMode(QToolButton.InstantPopup)
         act = QAction(QIcon('resource/icon/folder.png'), 'DelayedPopup checkable', self)
@@ -225,7 +225,7 @@ class MainWindow(SARibbonMainWindow):
         act.setCheckable(True)
         act.setMenu(menu)
         act.triggered.connect(self.onDelayedPopupCheckableTest)
-        btn = pannel.addLargeAction(act)
+        btn = panel.addLargeAction(act)
         btn.setObjectName('SA_DelayedPopup checkable')
         btn.setCheckable(True)
         btn.setPopupMode(QToolButton.DelayedPopup)
@@ -234,12 +234,12 @@ class MainWindow(SARibbonMainWindow):
         act.setCheckable(True)
         act.setMenu(menu)
         act.triggered.connect(self.onMenuButtonPopupCheckableTest)
-        btn = pannel.addLargeAction(act)
+        btn = panel.addLargeAction(act)
         btn.setObjectName('SA_MenuButtonPopup checkable')
         btn.setCheckable(True)
         btn.setPopupMode(QToolButton.MenuButtonPopup)
 
-        pannel2 = page.addPannel('pannel 2')
+        panel2 = page.addPanel('panel 2')
 
         def tmp_func1(on: bool):
             if on:
@@ -252,7 +252,7 @@ class MainWindow(SARibbonMainWindow):
         act.setIcon(QIcon('resource/icon/Graph-add.png'))
         act.setCheckable(True)
         act.triggered.connect(tmp_func1)
-        btn = pannel2.addLargeAction(act)
+        btn = panel2.addLargeAction(act)
         btn.setCheckable(True)
 
         def tmp_func2(on: bool):
@@ -266,7 +266,7 @@ class MainWindow(SARibbonMainWindow):
         act2.setIcon(QIcon('resource/icon/529398.png'))
         act2.setCheckable(True)
         act2.triggered.connect(tmp_func2)
-        pannel2.addLargeAction(act2)
+        panel2.addLargeAction(act2)
 
         act = QAction(self)
         act.setObjectName('unactive')
@@ -274,7 +274,7 @@ class MainWindow(SARibbonMainWindow):
         act.setIcon(QIcon('resource/icon/Graph-add.png'))
         act.setCheckable(True)
         act.setMenu(menu)
-        btn = pannel2.addLargeAction(act)
+        btn = panel2.addLargeAction(act)
         btn.setCheckable(True)
         btn.setPopupMode(QToolButton.InstantPopup)
         btn.setEnabled(False)
@@ -286,48 +286,48 @@ class MainWindow(SARibbonMainWindow):
         for i in range(20):
             com.addItem("item: {0}".format(i + 1))
         com.setEditable(True)
-        pannel2.addSmallWidget(com)
+        panel2.addSmallWidget(com)
 
         com2 = QComboBox(self)
         com2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         com2.setWindowTitle("ComboBox")
         for i in range(20):
             com2.addItem("item: {0}".format(i + 1))
-        pannel2.addSmallWidget(com2)
+        panel2.addSmallWidget(com2)
 
         lineEdit = QLineEdit(self)
         lineEdit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         lineEdit.setWindowTitle("Line Edit")
         lineEdit.setText("Test LineEdit")
-        pannel2.addSmallWidget(lineEdit)
+        panel2.addSmallWidget(lineEdit)
 
         checkBox = QCheckBox(self)
         checkBox.setText("checkBox")
-        pannel2.addSmallWidget(checkBox)
+        panel2.addSmallWidget(checkBox)
 
-        pannel2.addSeparator()
+        panel2.addSeparator()
         calendarWidget = QCalendarWidget(self)
         calendarWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         calendarWidget.setObjectName('CalendarWidget')
-        pannel2.addLargeWidget(calendarWidget)
-        pannel2.setExpanding()
+        panel2.addLargeWidget(calendarWidget)
+        panel2.setExpanding()
         optAct = QAction(self)
         optAct.toggled.connect(lambda on: self.m_edit.append('OptionAction triggered'))
-        pannel2.addOptionAction(optAct)
-        pannel2.setVisible(True)
+        panel2.addOptionAction(optAct)
+        panel2.setVisible(True)
 
     def createCategoryOther(self, page: SARibbonCategory):
-        pannel = SARibbonPannel('Pannel One')
-        page.addPannel(pannel)
+        panel = SARibbonPanel('Panel One')
+        page.addPanel(panel)
 
-        btnGroup = SARibbonButtonGroupWidget(pannel)
+        btnGroup = SARibbonButtonGroupWidget(panel)
         btnGroup.addAction(QAction(QIcon("resource/icon/figureIcon.png"), 'test1', self))
         btnGroup.addAction(QAction(QIcon("resource/icon/information.png"), 'test2', self))
         btnGroup.addAction(QAction(QIcon("resource/icon/chartDataManager.png"), 'test3', self))
         btnGroup.addAction(QAction(QIcon("resource/icon/inRangDataRemove.png"), 'test4', self))
-        pannel.addLargeWidget(btnGroup)
+        panel.addLargeWidget(btnGroup)
 
-        pannel.addSeparator()
+        panel.addSeparator()
 
         menu = SARibbonMenu(self)
         item = menu.addAction(QIcon("resource/icon/folder.png"), 'menu item test')
@@ -342,21 +342,21 @@ class MainWindow(SARibbonMainWindow):
         menu.addAction(QIcon("resource/icon/folder.png"), '8')
         menu.addAction(QIcon("resource/icon/folder.png"), '9')
 
-        btn = pannel.addLargeAction(QAction(item))
+        btn = panel.addLargeAction(QAction(item))
         btn.setText('un format icon')
         btn.setIcon(QIcon('resource/icon/folder.png'))
         btn.setFixedHeight(78)
         btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         btn.setPopupMode(QToolButton.DelayedPopup)
         btn.setMenu(menu)
-        btn = pannel.addLargeAction(QAction(item))
+        btn = panel.addLargeAction(QAction(item))
         btn.setText('change page test')
         btn.setIcon(QIcon('resource/icon/folder.png'))
         btn.setFixedHeight(78)
         btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         btn.setPopupMode(QToolButton.MenuButtonPopup)
         btn.setMenu(menu)
-        btn = pannel.addLargeAction(QAction(item))
+        btn = panel.addLargeAction(QAction(item))
         btn.setText('LargeBtn')
         btn.setIcon(QIcon('resource/icon/folder.png'))
         btn.setFixedHeight(78)
@@ -366,10 +366,10 @@ class MainWindow(SARibbonMainWindow):
 
         optAct = QAction(self)
         optAct.setObjectName('Debug')
-        pannel.addOptionAction(optAct)
-        pannel.setObjectName('Debug')
+        panel.addOptionAction(optAct)
+        panel.setObjectName('Debug')
 
-        pannel.addSeparator()
+        panel.addSeparator()
         appAct = QAction(QIcon("resource/icon/icon2.png"), 'no application button and very long word test', self)
         appAct.setObjectName('no application button and very long word test')
         appAct.setCheckable(True)
@@ -381,7 +381,7 @@ class MainWindow(SARibbonMainWindow):
             else:
                 sAppBtn.setText('File')
         appAct.toggled.connect(tmp_func1)
-        btn = pannel.addLargeAction(appAct)
+        btn = panel.addLargeAction(appAct)
         btn.setObjectName('ApplicationButtonTest')
 
         def tmp_func2(on: bool):
@@ -396,61 +396,61 @@ class MainWindow(SARibbonMainWindow):
         useqss.setObjectName('use qss')
         useqss.setCheckable(True)
         useqss.triggered.connect(tmp_func2)
-        pannel.addLargeAction(useqss)
+        panel.addLargeAction(useqss)
 
         def tmp_func3(on: bool):
             if not self.loadCustomizeXmlHascall:
                 self.loadCustomizeXmlHascall = SARibbonCustomizeWidget.sa_apply_customize_from_xml_file("customize.xml", self, self.m_actMgr)
         loadCustomizeXmlFile = QAction(QIcon("resource/icon/506405.png"), "load customize from xml file", self)
         loadCustomizeXmlFile.triggered.connect(tmp_func3)
-        pannel.addLargeAction(loadCustomizeXmlFile)
+        panel.addLargeAction(loadCustomizeXmlFile)
 
         normalButton = QAction(QIcon("resource/icon/506354.png"), '正常模式', self)
         normalButton.setObjectName('normalButton')
-        pannel.addLargeAction(normalButton)
+        panel.addLargeAction(normalButton)
         normalButton.triggered.connect(lambda on: self.updateWindowFlag(self.windowFlags() | Qt.WindowMinMaxButtonsHint
                                                                         | Qt.WindowCloseButtonHint))
         noneButton = QAction(QIcon("resource/icon/506359.png"), '无按钮模式', self)
         noneButton.setObjectName('noneButton')
-        pannel.addLargeAction(noneButton)
+        panel.addLargeAction(noneButton)
         noneButton.triggered.connect(lambda on: self.updateWindowFlag(self.windowFlags() & ~Qt.WindowMinMaxButtonsHint
                                                                       & ~Qt.WindowCloseButtonHint))
-        changename = QAction(QIcon("resource/icon/529398.png"), '改变pannel名字', self)
+        changename = QAction(QIcon("resource/icon/529398.png"), '改变panel名字', self)
         changename.setObjectName('changename')
-        pannel.addLargeAction(changename)
-        changename.triggered.connect(lambda on: pannel.setPannelName('变、变、变'))
+        panel.addLargeAction(changename)
+        changename.triggered.connect(lambda on: panel.setPanelName('变、变、变'))
 
-        pannel.addSeparator()
-        gallery = SARibbonGallery(pannel)
+        panel.addSeparator()
+        gallery = SARibbonGallery(panel)
         group = gallery.addGalleryGroup()
         for i in range(10):
             group.addItem(str(i+1), QIcon('resource/icon/folder.png'))
-        pannel.addGallery(gallery)
+        panel.addGallery(gallery)
 
-        pannel2 = SARibbonPannel('ContextCategory')
-        page.addPannel(pannel2)
+        panel2 = SARibbonPanel('ContextCategory')
+        page.addPanel(panel2)
         a1 = QAction(QIcon("resource/icon/529398.png"), 'Context Category 1', self)
         a1.setCheckable(True)
         a1.triggered.connect(lambda on: self.ribbonBar().setContextCategoryVisible(self.m_contextCategory, on))
-        pannel2.addLargeAction(a1)
+        panel2.addLargeAction(a1)
         a2 = QAction(QIcon("resource/icon/529398.png"), 'Context Category 2', self)
         a2.setCheckable(True)
         a2.triggered.connect(lambda on: self.ribbonBar().setContextCategoryVisible(self.m_contextCategory2, on))
-        pannel2.addLargeAction(a2)
+        panel2.addLargeAction(a2)
 
     def createCategoryDelete(self, page: SARibbonCategory):
-        pannel1 = page.addPannel('pannel 1')
-        pannel2 = page.addPannel('pannel 2')
+        panel1 = page.addPanel('panel 1')
+        panel2 = page.addPanel('panel 2')
         act = QAction(self)
-        act.setText('删除Pannel2')
+        act.setText('删除Panel2')
         act.setIcon(QIcon('resource/icon/506356.png'))
-        pannel1.addLargeAction(act)
-        act.triggered.connect(lambda: page.removePannel(pannel2))
+        panel1.addLargeAction(act)
+        act.triggered.connect(lambda: page.removePanel(panel2))
 
         act = QAction(self)
         act.setText('删除本页')
         act.setIcon(QIcon('resource/icon/506357.png'))
-        pannel2.addLargeAction(act)
+        panel2.addLargeAction(act)
 
         def tmp_func(on: bool):
             self.ribbonBar().removeCategory(page)
@@ -460,14 +460,14 @@ class MainWindow(SARibbonMainWindow):
         act.triggered.connect(tmp_func)
 
     def createContextCategoryPage1(self, page: SARibbonCategory):
-        pannel = page.addPannel('显示隐藏操作')
-        act = QAction(QIcon('resource/icon/530150.png'), '隐藏pannel', self)
+        panel = page.addPanel('显示隐藏操作')
+        act = QAction(QIcon('resource/icon/530150.png'), '隐藏panel', self)
         act.setCheckable(True)
-        pannel.addLargeAction(act)
+        panel.addLargeAction(act)
 
         actd = QAction(QIcon('resource/icon/529398.png'), 'Disable', self)
         actd.setDisabled(True)
-        pannel.addLargeAction(actd)
+        panel.addLargeAction(actd)
         actd.triggered.connect(lambda on: actd.setDisabled(True) or actd.setText('Disable'))
 
         def tmp_func1(on: bool):
@@ -476,41 +476,41 @@ class MainWindow(SARibbonMainWindow):
         act1 = QAction(QIcon('resource/icon/529398.png'), '解锁左边的按钮', self)
         act1.setShortcut('Ctrl+E')
         act1.triggered.connect(tmp_func1)
-        pannel.addLargeAction(act1)
+        panel.addLargeAction(act1)
 
         act = QAction(QIcon('resource/icon/530767.png'), 'setText测试\r\nCtrl+D', self)
         act.setCheckable(True)
         act.setShortcut('Ctrl+D')
-        pannel.addLargeAction(act)
+        panel.addLargeAction(act)
         act.toggled.connect(lambda on: act.setText('点击了') if on else act.setText('setText测试'))
 
-        # 隐藏pannel
-        act1 = QAction(QIcon('resource/icon/arror.png'), '显示旁边的pannel', self)
+        # 隐藏panel
+        act1 = QAction(QIcon('resource/icon/arror.png'), '显示旁边的panel', self)
         act1.setCheckable(True)
-        pannel.addLargeAction(act1)
+        panel.addLargeAction(act1)
 
-        pannel2 = page.addPannel('用于隐藏显示的测试')
-        pannel2.addLargeAction(act)
+        panel2 = page.addPanel('用于隐藏显示的测试')
+        panel2.addLargeAction(act)
 
         def tmp_func2(on: bool):
-            pannel2.setVisible(not on)
-            text = '隐藏旁边的pannel' if on else '显示旁边的pannel'
+            panel2.setVisible(not on)
+            text = '隐藏旁边的panel' if on else '显示旁边的panel'
             act1.setText(text)
             self.ribbonBar().repaint()
         act1.toggled.connect(tmp_func2)
 
-        pannel3 = page.addPannel('action隐藏显示的测试')
+        panel3 = page.addPanel('action隐藏显示的测试')
 
         act1 = QAction(QIcon('resource/icon/arror.png'), '隐藏action2', self)
         act1.setCheckable(True)
         act1.setChecked(True)
-        pannel3.addLargeAction(act1)
+        panel3.addLargeAction(act1)
         act2 = QAction(QIcon('resource/icon/arror.png'), 'action 2', self)
-        pannel3.addSmallAction(act2)
+        panel3.addSmallAction(act2)
         act3 = QAction(QIcon('resource/icon/arror.png'), 'action 3', self)
-        pannel3.addSmallAction(act3)
+        panel3.addSmallAction(act3)
         act4 = QAction(QIcon('resource/icon/arror.png'), 'action 4', self)
-        pannel3.addSmallAction(act4)
+        panel3.addSmallAction(act4)
 
         def tmp_func3(on: bool):
             text = '隐藏action2' if on else '显示action2'
@@ -519,40 +519,40 @@ class MainWindow(SARibbonMainWindow):
         act1.triggered.connect(tmp_func3)
 
     def createContextCategoryPage2(self, page: SARibbonCategory):
-        pannel = page.addPannel('删除CategoryPage测试')
+        panel = page.addPanel('删除CategoryPage测试')
 
         def tmp_func(on: bool):
             self.ribbonBar().removeCategory(page)
             page.deleteLater()
         act = QAction(QIcon('resource/icon/529398.png'), '删除本页', self)
         act.triggered.connect(tmp_func)
-        pannel.addLargeAction(act)
+        panel.addLargeAction(act)
 
-        pannel2 = page.addPannel('特殊布局')
+        panel2 = page.addPanel('特殊布局')
 
-        pannel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPLarge)
-        pannel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPSmall)
-        pannel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPSmall)
-        pannel2.addSeparator()
-        pannel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPSmall)
-        pannel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPSmall)
-        pannel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPSmall)
-        pannel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPSmall)
-        pannel2.addSeparator()
-        pannel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPLarge)
-        pannel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPMedium)
-        pannel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPMedium)
-        pannel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPSmall)
-        pannel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPMedium)
-        pannel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPLarge)
-        pannel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPMedium)
-        pannel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPMedium)
-        pannel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPLarge)
-        pannel2.addSeparator()
-        pannel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPMedium)
-        pannel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPLarge)
-        pannel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPMedium)
-        pannel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPannelItem.RPLarge)
+        panel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPLarge)
+        panel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPSmall)
+        panel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPSmall)
+        panel2.addSeparator()
+        panel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPSmall)
+        panel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPSmall)
+        panel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPSmall)
+        panel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPSmall)
+        panel2.addSeparator()
+        panel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPLarge)
+        panel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPMedium)
+        panel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPMedium)
+        panel2.addAction('Small', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPSmall)
+        panel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPMedium)
+        panel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPLarge)
+        panel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPMedium)
+        panel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPMedium)
+        panel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPLarge)
+        panel2.addSeparator()
+        panel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPMedium)
+        panel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPLarge)
+        panel2.addAction('Medium', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPMedium)
+        panel2.addAction('Large', QIcon('resource/icon/530767.png'), QToolButton.InstantPopup, SARibbonPanelItem.RPLarge)
 
     def addSomeOtherAction(self):
         # 添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用

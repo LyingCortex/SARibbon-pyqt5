@@ -59,90 +59,90 @@ class TestCoreCreation:
         from PySARibbon import SARibbonCategory
         c = SARibbonCategory()
         assert c is not None
-        assert c.pannelCount() == 0
+        assert c.panelCount() == 0
 
-    def test_pannel_creation(self, app):
-        from PySARibbon import SARibbonPannel
-        p = SARibbonPannel('Test', None)
-        assert p.pannelName() == 'Test'
+    def test_panel_creation(self, app):
+        from PySARibbon import SARibbonPanel
+        p = SARibbonPanel('Test', None)
+        assert p.panelName() == 'Test'
 
-    def test_pannel_layout_creation(self, app):
-        from PySARibbon import SARibbonPannelLayout
-        from PySARibbon import SARibbonPannel
-        p = SARibbonPannel('Test', None)
+    def test_panel_layout_creation(self, app):
+        from PySARibbon import SARibbonPanelLayout
+        from PySARibbon import SARibbonPanel
+        p = SARibbonPanel('Test', None)
         layout = p.layout()
-        assert isinstance(layout, SARibbonPannelLayout)
+        assert isinstance(layout, SARibbonPanelLayout)
 
 
 # ============================================================
-# Pannel 添加/删除
+# Panel 添加/删除
 # ============================================================
 
-class TestPannelManagement:
-    def test_add_pannel_by_name(self, ribbon_window):
+class TestPanelManagement:
+    def test_add_panel_by_name(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('TestCat')
-        pannel = category.addPannel('TestPannel')
-        assert pannel is not None
-        assert category.pannelCount() == 1
-        assert pannel.pannelName() == 'TestPannel'
+        panel = category.addPanel('TestPanel')
+        assert panel is not None
+        assert category.panelCount() == 1
+        assert panel.panelName() == 'TestPanel'
 
-    def test_add_multiple_pannels(self, ribbon_window):
+    def test_add_multiple_panels(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('Multi')
-        category.addPannel('P1')
-        category.addPannel('P2')
-        category.addPannel('P3')
-        assert category.pannelCount() == 3
+        category.addPanel('P1')
+        category.addPanel('P2')
+        category.addPanel('P3')
+        assert category.panelCount() == 3
 
-    def test_pannel_by_name(self, ribbon_window):
+    def test_panel_by_name(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('Find')
-        category.addPannel('Target')
-        found = category.pannelByName('Target')
+        category.addPanel('Target')
+        found = category.panelByName('Target')
         assert found is not None
-        assert found.pannelName() == 'Target'
+        assert found.panelName() == 'Target'
 
-    def test_pannel_by_index(self, ribbon_window):
+    def test_panel_by_index(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('Index')
-        p0 = category.addPannel('First')
-        p1 = category.addPannel('Second')
-        assert category.pannelByIndex(0) == p0
-        assert category.pannelByIndex(1) == p1
-        assert category.pannelByIndex(99) is None
+        p0 = category.addPanel('First')
+        p1 = category.addPanel('Second')
+        assert category.panelByIndex(0) == p0
+        assert category.panelByIndex(1) == p1
+        assert category.panelByIndex(99) is None
 
-    def test_remove_pannel(self, ribbon_window):
+    def test_remove_panel(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('Remove')
-        category.addPannel('ToRemove')
-        assert category.pannelCount() == 1
-        result = category.removePannel(0)
+        category.addPanel('ToRemove')
+        assert category.panelCount() == 1
+        result = category.removePanel(0)
         assert result is True
-        assert category.pannelCount() == 0
+        assert category.panelCount() == 0
 
-    def test_remove_pannel_by_reference(self, ribbon_window):
+    def test_remove_panel_by_reference(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('RemoveRef')
-        pannel = category.addPannel('Target')
-        assert category.removePannel(pannel) is True
-        assert category.pannelCount() == 0
+        panel = category.addPanel('Target')
+        assert category.removePanel(panel) is True
+        assert category.panelCount() == 0
 
-    def test_move_pannel(self, ribbon_window):
+    def test_move_panel(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('Move')
-        p0 = category.addPannel('A')
-        p1 = category.addPannel('B')
-        category.movePannel(0, 1)
-        assert category.pannelByIndex(0) == p1
-        assert category.pannelByIndex(1) == p0
+        p0 = category.addPanel('A')
+        p1 = category.addPanel('B')
+        category.movePanel(0, 1)
+        assert category.panelByIndex(0) == p1
+        assert category.panelByIndex(1) == p0
 
-    def test_add_action_to_pannel(self, ribbon_window):
+    def test_add_action_to_panel(self, ribbon_window):
         bar = ribbon_window.ribbonBar()
         category = bar.addCategoryPage('Actions')
-        pannel = category.addPannel('ActPannel')
+        panel = category.addPanel('ActPanel')
         act = QAction('TestAction', ribbon_window)
-        btn = pannel.addLargeAction(act)
+        btn = panel.addLargeAction(act)
         assert btn is not None
 
 

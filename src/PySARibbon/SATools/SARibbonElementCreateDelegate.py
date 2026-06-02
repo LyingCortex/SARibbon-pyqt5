@@ -12,7 +12,7 @@ from ..SAWidgets.SARibbonGalleryGroup import SARibbonGalleryGroup
 from ..SAWidgets.SARibbonToolButton import SARibbonToolButton
 from ..SAWidgets.SARibbonStackedWidget import SARibbonStackedWidget
 from ..SAWidgets.SARibbonControlButton import SARibbonControlButton
-from ..SAWidgets.SARibbonPannelOptionButton import SARibbonPannelOptionButton
+from ..SAWidgets.SARibbonPanelOptionButton import SARibbonPanelOptionButton
 
 
 class SARibbonStyleOption:
@@ -61,23 +61,23 @@ class SARibbonElementCreateDelegate:
     def createRibbonStackedWidget(self, parent):
         return SARibbonStackedWidget(parent)
 
-    def createHidePannelButton(self, parent):
+    def createHidePanelButton(self, parent):
         """
         创建隐藏ribbon的按钮代理函数,
         :param parent: SARibbonBar
         """
         btn = SARibbonControlButton(parent)
         btn.setAutoRaise(False)
-        btn.setObjectName('SARibbonBarHidePannelButton')
+        btn.setObjectName('SARibbonBarHidePanelButton')
         btn.setToolButtonStyle(Qt.ToolButtonIconOnly)
         btn.setFixedSize(parent.tabBarHeight()-4, parent.tabBarHeight()-4)
         return btn
 
-    def createRibbonPannelOptionButton(self, parent):
+    def createRibbonPanelOptionButton(self, parent):
         """
-        创建SARibbonPannelOptionButton
+        创建SARibbonPanelOptionButton
         """
-        return SARibbonPannelOptionButton(parent)
+        return SARibbonPanelOptionButton(parent)
 
     def createRibbonCommonWidget(self, parent, WidgetClass):
         """

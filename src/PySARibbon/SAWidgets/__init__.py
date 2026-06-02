@@ -10,8 +10,8 @@ from .SARibbonControlButton import SARibbonControlButton
 from .SARibbonCtrlContainer import SARibbonCtrlContainer
 from .SARibbonGalleryGroup import SARibbonGalleryGroup
 from .SARibbonMenu import SARibbonMenu
-from .SARibbonPannelItem import SARibbonPannelItem
-from .SARibbonPannelOptionButton import SARibbonPannelOptionButton
+from .SARibbonPanelItem import SARibbonPanelItem
+from .SARibbonPanelOptionButton import SARibbonPanelOptionButton
 from .SARibbonSeparatorWidget import SARibbonSeparatorWidget
 from .SARibbonStackedWidget import SARibbonStackedWidget
 from .SARibbonTabBar import SARibbonTabBar

@@ -1,39 +1,39 @@
 # -*- coding: utf-8 -*-
 """
-@Module     SARibbonPannel
+@Module     SARibbonPanel
 @Author     ROOT
 
-@brief pannel页窗口，pannel是ribbon的面板用于承放控件
-ribbon的pannel分为两行模式和三行模式，以office为代表的ribbon为3行模式，以WPS为代表的“紧凑派”就是2行模式，
+@brief panel页窗口，panel是ribbon的面板用于承放控件
+ribbon的panel分为两行模式和三行模式，以office为代表的ribbon为3行模式，以WPS为代表的“紧凑派”就是2行模式，
 SARibbon可通过SARibbonBar的 SARibbonBar.RibbonStyle 来指定模式(通过函数 SARibbonBar.setRibbonStyle)
 
-在pannel中，可以通过setExpanding 函数指定pannel水平扩展，如果pannel里面没有能水平扩展的控件，将会留白，
-因此，建议在pannel里面有水平扩展的控件如（SARibbonGallery）才指定这个函数
+在panel中，可以通过setExpanding 函数指定panel水平扩展，如果panel里面没有能水平扩展的控件，将会留白，
+因此，建议在panel里面有水平扩展的控件如（SARibbonGallery）才指定这个函数
 
-pannel的布局通过 SARibbonPannelLayout 来实现，如果有其他布局，可以通过继承 SARibbonElementCreateDelegate.createRibbonPannel
-函数返回带有自己布局的pannel，但你必须继承对应的虚函数
+panel的布局通过 SARibbonPanelLayout 来实现，如果有其他布局，可以通过继承 SARibbonElementCreateDelegate.createRibbonPanel
+函数返回带有自己布局的panel，但你必须继承对应的虚函数
 """
 from typing import List, Union
 
 from .compat import pyqtSignal, Qt, QEvent, QSize, QPainter, QApplication, QWidget, QAction, QToolButton, QMenu, QSizePolicy
 
-from .SAWidgets.SARibbonPannelOptionButton import SARibbonPannelOptionButton
+from .SAWidgets.SARibbonPanelOptionButton import SARibbonPanelOptionButton
 from .SAWidgets.SARibbonSeparatorWidget import SARibbonSeparatorWidget
 from .SAWidgets.SARibbonToolButton import SARibbonToolButton
-from .SAWidgets.SARibbonPannelItem import SARibbonPannelItem
+from .SAWidgets.SARibbonPanelItem import SARibbonPanelItem
 from .SATools.SARibbonElementManager import RibbonSubElementDelegate
 from .SARibbonGallery import SARibbonGallery
-from .SARibbonPannelLayout import SARibbonPannelLayout
+from .SARibbonPanelLayout import SARibbonPanelLayout
 
 
-class SARibbonPannel(QWidget):
+class SARibbonPanel(QWidget):
     # 信号
     actionTriggered = pyqtSignal(QAction)
 
     def __init__(self, *_args):
         """
-        SARibbonPannel(parent=None)
-        SARibbonPannel(str, parent=None)
+        SARibbonPanel(parent=None)
+        SARibbonPanel(str, parent=None)
         """
         parent = None
         name = ''
@@ -45,19 +45,19 @@ class SARibbonPannel(QWidget):
             parent = _args[0]
         super().__init__(parent)
 
-        self._pannelLayoutMode = SARibbonPannel.ThreeRowMode
-        self._lastRp = SARibbonPannelItem.RPNone
-        self._optionActionButton: SARibbonPannelOptionButton = None
-        self._layout: SARibbonPannelLayout = None
+        self._panelLayoutMode = SARibbonPanel.ThreeRowMode
+        self._lastRp = SARibbonPanelItem.RPNone
+        self._optionActionButton: SARibbonPanelOptionButton = None
+        self._layout: SARibbonPanelLayout = None
         self._isCanCustomize = True
         self._enableShowTitle = True
 
         self.createLayout()
-        self.setPannelLayoutMode(SARibbonPannel.ThreeRowMode)
-        self.setPannelName(name)
+        self.setPanelLayoutMode(SARibbonPanel.ThreeRowMode)
+        self.setPanelName(name)
 
     def createLayout(self):
-        layout = SARibbonPannelLayout(self)
+        layout = SARibbonPanelLayout(self)
         layout.setRowCount(self.rowCount())
         layout.setSpacing(2)
         layout.setContentsMargins(2, 2, 2, 2)
@@ -65,15 +65,15 @@ class SARibbonPannel(QWidget):
         self._layout = layout
 
     def rowCount(self) -> int:
-        mode = self.pannelLayoutMode()
-        if mode == SARibbonPannel.SingleRowMode:
+        mode = self.panelLayoutMode()
+        if mode == SARibbonPanel.SingleRowMode:
             return 1
-        elif mode == SARibbonPannel.TwoRowMode:
+        elif mode == SARibbonPanel.TwoRowMode:
             return 2
         return 3
 
-    def pannelLayoutMode(self) -> int:
-        return self._pannelLayoutMode
+    def panelLayoutMode(self) -> int:
+        return self._panelLayoutMode
 
     def isTwoRow(self) -> bool:
         """判断是否为2行模式"""
@@ -88,7 +88,7 @@ class SARibbonPannel(QWidget):
 
     def setActionRowProportion(self, act: QAction, rp):
         lay = self._layout
-        it = lay.pannelItem(act)
+        it = lay.panelItem(act)
         if it:
             it.rowProportion = rp
             lay.invalidate()
@@ -96,11 +96,11 @@ class SARibbonPannel(QWidget):
     def addAction(self, *_args) -> Union[SARibbonToolButton, QAction]:
         """
         addAction(QAction, rp: int) -> SARibbonToolButton
-        addAction(str, QIcon, popMode: int, rp=SARibbonPannelItem.RPLarge) -> QAction
+        addAction(str, QIcon, popMode: int, rp=SARibbonPanelItem.RPLarge) -> QAction
         """
 
         if len(_args) >= 3:
-            rp = SARibbonPannelItem.RPLarge if len(_args) < 4 else _args[3]
+            rp = SARibbonPanelItem.RPLarge if len(_args) < 4 else _args[3]
             act = QAction(_args[1], _args[0], self)
             self._lastRp = rp
             super().addAction(act)
@@ -114,13 +114,13 @@ class SARibbonPannel(QWidget):
             return self.lastAddActionButton()
 
     def addLargeAction(self, act: QAction) -> SARibbonToolButton:
-        return self.addAction(act, SARibbonPannelItem.RPLarge)
+        return self.addAction(act, SARibbonPanelItem.RPLarge)
 
     def addMediumAction(self, act: QAction) -> SARibbonToolButton:
-        return self.addAction(act, SARibbonPannelItem.RPMedium)
+        return self.addAction(act, SARibbonPanelItem.RPMedium)
 
     def addSmallAction(self, act: QAction) -> SARibbonToolButton:
-        return self.addAction(act, SARibbonPannelItem.RPSmall)
+        return self.addAction(act, SARibbonPanelItem.RPSmall)
 
     def addMenu(self, menu: QMenu, rp, popMode=QToolButton.InstantPopup) -> SARibbonToolButton:
         """添加一个普通菜单"""
@@ -139,13 +139,13 @@ class SARibbonPannel(QWidget):
         return btn
 
     def addLargeActionMenu(self, action: QAction, menu: QMenu) -> SARibbonToolButton:
-        return self.addActionMenu(action, menu, SARibbonPannelItem.RPLarge)
+        return self.addActionMenu(action, menu, SARibbonPanelItem.RPLarge)
 
     def addLargeMenu(self, menu: QMenu, popMode=QToolButton.InstantPopup) -> SARibbonToolButton:
-        return self.addMenu(menu, SARibbonPannelItem.RPLarge, popMode)
+        return self.addMenu(menu, SARibbonPanelItem.RPLarge, popMode)
 
     def addSmallMenu(self, menu: QMenu, popMode=QToolButton.InstantPopup) -> SARibbonToolButton:
-        return self.addMenu(menu, SARibbonPannelItem.RPSmall, popMode)
+        return self.addMenu(menu, SARibbonPanelItem.RPSmall, popMode)
 
     def addWidget(self, w: QWidget, rp):
         """添加Widget窗口"""
@@ -154,13 +154,13 @@ class SARibbonPannel(QWidget):
         self.updateGeometry()
 
     def addSmallWidget(self, w: QWidget):
-        return self.addWidget(w, SARibbonPannelItem.RPSmall)
+        return self.addWidget(w, SARibbonPanelItem.RPSmall)
 
     def addLargeWidget(self, w: QWidget):
-        return self.addWidget(w, SARibbonPannelItem.RPLarge)
+        return self.addWidget(w, SARibbonPanelItem.RPLarge)
 
     def addGallery(self, gallery: SARibbonGallery):
-        """SARibbonPannel将拥有SARibbonGallery的管理权"""
+        """SARibbonPanel将拥有SARibbonGallery的管理权"""
         self.addLargeWidget(gallery)
         self.setExpanding()
 
@@ -172,7 +172,7 @@ class SARibbonPannel(QWidget):
         self.updateGeometry()
 
     def actionToRibbonToolButton(self, action: QAction) -> Union[SARibbonToolButton, None]:
-        """从pannel中把action对应的button提取出来"""
+        """从panel中把action对应的button提取出来"""
         lay = self.layout()
         if not lay:
             return None
@@ -191,7 +191,7 @@ class SARibbonPannel(QWidget):
             self._layout.setOptionAction(True, self.optionActionButtonSize())
             return
         if self._optionActionButton is None:
-            self._optionActionButton = RibbonSubElementDelegate.createRibbonPannelOptionButton(self)
+            self._optionActionButton = RibbonSubElementDelegate.createRibbonPanelOptionButton(self)
         self._optionActionButton.setFixedSize(self.optionActionButtonSize())
         self._optionActionButton.setIconSize(self.optionActionButtonSize() - QSize(-2, -2))
         self._optionActionButton.connectAction(action)
@@ -209,14 +209,14 @@ class SARibbonPannel(QWidget):
         return size
 
     def ribbonToolButtons(self) -> List[SARibbonToolButton]:
-        """获取pannel下面的所有toolbutton"""
+        """获取panel下面的所有toolbutton"""
         objs = self.children()
         return [obj for obj in objs if isinstance(obj, SARibbonToolButton)]
 
     def sizeHint(self):
         laySize = self.layout().sizeHint()
         maxWidth = laySize.width() + 2
-        if self.pannelLayoutMode() == self.ThreeRowMode:
+        if self.panelLayoutMode() == self.ThreeRowMode:
             # 三行模式
             fm = self.fontMetrics()
             titleSize = fm.size(Qt.TextShowMnemonic, self.windowTitle())
@@ -230,12 +230,12 @@ class SARibbonPannel(QWidget):
         return self.layout().minimumSize()
 
     def setExpanding(self, isExpanding=True):
-        """把pannel设置为扩展模式，此时会撑大水平区域"""
+        """把panel设置为扩展模式，此时会撑大水平区域"""
         p = QSizePolicy.Expanding if isExpanding else QSizePolicy.Preferred
         self.setSizePolicy(p, QSizePolicy.Preferred)
 
     def isExpanding(self) -> bool:
-        """判断此pannel是否为（水平）扩展模式"""
+        """判断此panel是否为（水平）扩展模式"""
         sp = self.sizePolicy()
         return sp.horizontalPolicy() == QSizePolicy.Expanding
 
@@ -243,7 +243,7 @@ class SARibbonPannel(QWidget):
         """标题栏高度，仅在三行模式且启用标题时生效"""
         if not self._enableShowTitle:
             return 0
-        if self.pannelLayoutMode() == SARibbonPannel.ThreeRowMode:
+        if self.panelLayoutMode() == SARibbonPanel.ThreeRowMode:
             return 21
         return 0
 
@@ -293,21 +293,21 @@ class SARibbonPannel(QWidget):
         """设置是否可以自定义"""
         self._isCanCustomize = b
 
-    def pannelName(self) -> str:
-        """pannel的标题"""
+    def panelName(self) -> str:
+        """panel的标题"""
         return self.windowTitle()
 
-    def setPannelName(self, title: str):
-        """设置pannel的标题"""
+    def setPanelName(self, title: str):
+        """设置panel的标题"""
         if not title:
             return
         self.setWindowTitle(title)
         self.update()   # 注意会触发windowTitleChange信号
 
-    def setPannelLayoutMode(self, mode):
-        if self._pannelLayoutMode == mode:
+    def setPanelLayoutMode(self, mode):
+        if self._panelLayoutMode == mode:
             return
-        self._pannelLayoutMode = mode
+        self._panelLayoutMode = mode
         self.resetLayout(mode)
         self.resetLargeToolButtonStyle()
 
@@ -319,7 +319,7 @@ class SARibbonPannel(QWidget):
     def resetLargeToolButtonStyle(self):
         """重置大按钮的类型"""
         btns = self.ribbonToolButtons()
-        if SARibbonPannel.SingleRowMode == self.pannelLayoutMode():
+        if SARibbonPanel.SingleRowMode == self.panelLayoutMode():
             # SingleRow模式下所有按钮都使用SmallButton水平布局
             for b in btns:
                 if b and b.buttonType() != SARibbonToolButton.SmallButton:
@@ -328,14 +328,14 @@ class SARibbonPannel(QWidget):
         for b in btns:
             if not b or SARibbonToolButton.LargeButton != b.buttonType():
                 continue
-            if SARibbonPannel.ThreeRowMode == self.pannelLayoutMode():
+            if SARibbonPanel.ThreeRowMode == self.panelLayoutMode():
                 if SARibbonToolButton.Normal != b.largeButtonType():
                     b.setLargeButtonType(SARibbonToolButton.Normal)
             else:
                 if SARibbonToolButton.Lite != b.largeButtonType():
                     b.setLargeButtonType(SARibbonToolButton.Lite)
 
-    def ribbonPannelItem(self) -> List[SARibbonPannelItem]:
+    def ribbonPanelItem(self) -> List[SARibbonPanelItem]:
         return self._layout._items
 
     @staticmethod
@@ -348,7 +348,7 @@ class SARibbonPannel(QWidget):
     # 事件
     def paintEvent(self, e):
         # 绘制小标题
-        if SARibbonPannel.ThreeRowMode == self.pannelLayoutMode():
+        if SARibbonPanel.ThreeRowMode == self.panelLayoutMode():
             p = QPainter(self)
             f = self.font()
             p.setFont(f)
@@ -360,7 +360,7 @@ class SARibbonPannel(QWidget):
     def resizeEvent(self, e):
         # 首先，移动操作按钮到角落
         if self._optionActionButton:
-            if SARibbonPannel.ThreeRowMode == self.pannelLayoutMode():
+            if SARibbonPanel.ThreeRowMode == self.panelLayoutMode():
                 self._optionActionButton.move(
                     self.width() - self._optionActionButton.width() - 2,
                     self.height() - int((self.titleHeight() + self._optionActionButton.height()) / 2)
@@ -385,14 +385,14 @@ class SARibbonPannel(QWidget):
             # if e.before():  # 说明是插入
             #     index = lay.indexOf(action)
             self._layout.addAction(action, self._lastRp)
-            self._lastRp = SARibbonPannelItem.RPNone   # 插入完后重置为None
-            # 由于pannel的尺寸发生变化，需要让category也调整
+            self._lastRp = SARibbonPanelItem.RPNone   # 插入完后重置为None
+            # 由于panel的尺寸发生变化，需要让category也调整
             if self.parentWidget():
                 QApplication.postEvent(self.parentWidget(), QEvent(QEvent.LayoutRequest))
         elif e.type() == QEvent.ActionChanged:
             # 让布局重新绘制
             self.layout().invalidate()
-            # 由于pannel的尺寸发生变化，需要让category也调整
+            # 由于panel的尺寸发生变化，需要让category也调整
             if self.parentWidget():
                 QApplication.postEvent(self.parentWidget(), QEvent(QEvent.LayoutRequest))
         elif e.type() == QEvent.ActionRemoved:
@@ -400,14 +400,14 @@ class SARibbonPannel(QWidget):
             index = self._layout.indexOf(action)
             if index != -1:
                 self._layout.takeAt(index)
-            # 由于pannel的尺寸发生变化，需要让category也调整
+            # 由于panel的尺寸发生变化，需要让category也调整
             if self.parentWidget():
                 QApplication.postEvent(self.parentWidget(), QEvent(QEvent.LayoutRequest))
 
-    # PannelLayoutMode
-    ThreeRowMode = SARibbonPannelLayout.ThreeRowMode
-    TwoRowMode = SARibbonPannelLayout.TwoRowMode
-    SingleRowMode = SARibbonPannelLayout.SingleRowMode
+    # PanelLayoutMode
+    ThreeRowMode = SARibbonPanelLayout.ThreeRowMode
+    TwoRowMode = SARibbonPanelLayout.TwoRowMode
+    SingleRowMode = SARibbonPanelLayout.SingleRowMode
 
 
 if __name__ == '__main__':
@@ -415,29 +415,29 @@ if __name__ == '__main__':
 
     app = QApplication([])
     # mainWindow = QWidget()
-    pannel = SARibbonPannel('Pannel One', None)
-    mainWindow = pannel
+    panel = SARibbonPanel('Panel One', None)
+    mainWindow = panel
 
-    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', pannel)
-    pannel.addLargeAction(act)
+    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', panel)
+    panel.addLargeAction(act)
 
-    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', pannel)
-    pannel.addSmallAction(act)
-    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', pannel)
-    pannel.addSmallAction(act)
-    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', pannel)
-    pannel.addSmallAction(act)
+    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', panel)
+    panel.addSmallAction(act)
+    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', panel)
+    panel.addSmallAction(act)
+    act = QAction(QIcon("resource/icon/figureIcon.png"), 'test1', panel)
+    panel.addSmallAction(act)
 
-    pannel.addSeparator()
+    panel.addSeparator()
 
-    gallery = SARibbonGallery(pannel)
+    gallery = SARibbonGallery(panel)
     group = gallery.addGalleryGroup()
     group.addActionItem(QAction(QIcon('resource/icon/folder.png'), 'test'))
     for i in range(10):
         group.addItem('test ' + str(i), QIcon('resource/icon/folder.png'))
 
-    pannel.addGallery(gallery)
-    # pannel.addLargeWidget(gallery)
+    panel.addGallery(gallery)
+    # panel.addLargeWidget(gallery)
 
     mainWindow.setMinimumWidth(500)
     mainWindow.show()
