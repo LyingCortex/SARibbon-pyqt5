@@ -104,6 +104,7 @@ class SARibbonMainWindow(QMainWindow):
             s.setHeight(ribbonBar.titleBarHeight())
             self.m_windowButtonGroup.setFixedSize(s)
             self.m_windowButtonGroup.setWindowStates(self.windowState())
+            self.m_windowButtonGroup.show()
             self.m_useRibbon = True
 
         super().setMenuWidget(ribbonBar)
@@ -146,6 +147,12 @@ class SARibbonMainWindow(QMainWindow):
                 QEvent.MouseButtonDblClick
             ]
             if e.type() in e_list:
+                # 如果点击位置有子控件在处理，不要转发（避免吞掉按钮点击）
+                if e.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonDblClick):
+                    from .compat import mouseEventPos
+                    child = self.m_ribbonBar.childAt(mouseEventPos(e))
+                    if child and child != self.m_ribbonBar:
+                        return super().eventFilter(obj, e)
                 QApplication.sendEvent(self, e)
         return super().eventFilter(obj, e)
 
