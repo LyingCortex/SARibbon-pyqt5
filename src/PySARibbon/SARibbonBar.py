@@ -153,7 +153,10 @@ class SARibbonBarPrivate:
         self.stackedContainerWidget.clearFocus()
         self.ribbonTabBar.setFocus()
         self.stackedContainerWidget.hide()
-        self.mainClass.setFixedHeight(self.ribbonTabBar.geometry().bottom())
+        # 高度 = titleBar + tabBar + widgetBorder.top
+        from .SATools.SARibbonElementManager import RibbonSubElementStyleOpt
+        h = RibbonSubElementStyleOpt.titleBarHeight + RibbonSubElementStyleOpt.tabBarHeight + RibbonSubElementStyleOpt.widgetBorder.top()
+        self.mainClass.setFixedHeight(h)
 
     def setNormalMode(self):
         self.currentRibbonMode = SARibbonBar.NormalRibbonMode
