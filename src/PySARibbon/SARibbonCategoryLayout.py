@@ -172,7 +172,9 @@ class SARibbonCategoryLayout(QLayout):
         for item in self._items:
             if item.isEmpty():
                 continue
-            total += item.widget().sizeHint().width()
+            # 使用minimumSizeHint避免expand后的sizeHint导致无限膨胀
+            w = item.widget()
+            total += w.minimumSizeHint().width() if w else 0
             if item.separatorWidget:
                 total += item.separatorWidget.sizeHint().width()
         return total
@@ -209,7 +211,7 @@ class SARibbonCategoryLayout(QLayout):
             p = item.widget()
             if not p:
                 continue
-            pSize = p.sizeHint()
+            pSize = p.minimumSizeHint()
             sepSize = item.separatorWidget.sizeHint() if item.separatorWidget else QSize(0, 0)
             if p.isExpanding():
                 pSize.setWidth(pSize.width() + int(expandWidth))
