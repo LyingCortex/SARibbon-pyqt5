@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='PySARibbon',
-    version='1.1.0',
+    version='0.1.0',
     description='4种目前常见的ribbon样式.',
     # long_description=read('README.md'),
     keywords=('python', 'ribbon'),

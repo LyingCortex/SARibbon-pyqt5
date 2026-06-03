@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PySARibbon"
-version = "1.1.0"
+version = "0.1.0"
 description = "4种目前常见的ribbon样式."
 readme = "README.md"
 license = "MIT"
