@@ -216,3 +216,51 @@ QXxx.Value = QXxx.EnumClass.Value
 | File 按钮点击无反应 | eventFilter 吞掉了子控件点击 | 已检查 childAt |
 | 滚轮导致 panel 无限变宽 | expand 计算基于膨胀后的 sizeHint | 已改用 minimumSizeHint |
 | `setEnabled` 收到 None | Python 短路求值返回 None 非 False | 包裹 `bool()` |
+
+---
+
+## 五、任务进度
+
+### 已完成
+
+| 任务 | 状态 | 说明 |
+|------|------|------|
+| Bug 修复 | ✅ | 40+ 个 bug（含 GUI 测试中发现的） |
+| 架构重构 - CategoryLayout | ✅ | 提取为 QLayout 子类 |
+| 架构重构 - BarLayout | ✅ | 布局逻辑从 Bar 拆分到 Layout |
+| PyQt5/PyQt6 兼容层 | ✅ | compat.py + 枚举 shim |
+| SingleRow 模式 | ✅ | 对齐 C++ v2.8.0 |
+| SARibbonWidget | ✅ | 不依赖 QMainWindow 的容器 |
+| SARibbonApplicationWidget | ✅ | Backstage 面板 |
+| SARibbonColorToolButton | ✅ | 带颜色指示的工具按钮 |
+| SARibbonSystemButtonBar | ✅ | 替代 SAWindowButtonGroup |
+| 主题同步 | ✅ | 7 个主题从 C++ 版同步 |
+| API 补齐 | ✅ | enableWordWrap/IconRightText/ShowPanelTitle 等 |
+| 拼写修正 | ✅ | Pannel→Panel, applition→application, widgetBord→widgetBorder |
+| 代码风格统一 | ✅ | 信号位置、m_→_ 前缀、docstring |
+| 单元测试 | ✅ | 26 个测试 |
+| pyproject.toml | ✅ | 现代化打包 |
+| fullDemo.py | ✅ | 综合功能演示 |
+| 调试文档 | ✅ | CHANGELOG 第四节 |
+| Git 推送 | ✅ | GitHub + GitLab |
+
+### 未完成
+
+| 任务 | 优先级 | 说明 |
+|------|--------|------|
+| 发布 PyPI | 中 | 包已构建，需 PyPI token 上传 |
+| CI/CD | 低 | GitHub Actions 自动测试 |
+| RTL 布局 | 跳过 | 无需求 |
+| 消除 SARibbonBarPrivate | 低 | 将 m_d 模式改为直接属性 |
+| 更多 GUI 测试修复 | 持续 | 根据用户反馈持续修复 |
+
+### 仓库地址
+
+- GitHub: `git@github.com:LyingCortex/SARibbon-pyqt5.git` (master)
+- GitLab: `git@gitlab.internal.ericsson.com:eynulai/pysaribbon.git` (main)
+
+### 版本
+
+- 当前版本: v1.1.0
+- Python: >=3.7
+- PyQt: PyQt5>=5.12 或 PyQt6>=6.2
