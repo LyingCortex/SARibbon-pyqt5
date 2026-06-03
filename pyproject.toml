@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.7"
 authors = [
-    { name = "sardkit", email = "sardkit@163.com" },
+    { name = "yang liu", email = "liuyangxtp@gmail.com" },
 ]
 keywords = ["python", "ribbon", "pyqt5", "gui"]
 classifiers = [

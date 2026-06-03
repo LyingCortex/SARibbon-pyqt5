@@ -9,8 +9,8 @@ setup(
     license='MIT',
 
     url='https://github.com/sardkit/pysaribbon',
-    author='sardkit',
-    author_email='sardkit@163.com',
+    author='yang liu',
+    author_email='liuyangxtp@gmail.com',
 
     packages=find_packages(),
     py_modules=[],
