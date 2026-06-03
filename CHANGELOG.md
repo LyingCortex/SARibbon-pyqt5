@@ -135,3 +135,84 @@ SACustomize/*
 | **合计** | **2-3 天** |
 
 如果不需要同时支持 PyQt5 和 PyQt6，直接全量替换更简单，不需要 compat 层。
+
+---
+
+## 四、调试指南
+
+### 运行环境
+
+```bash
+# 从源码运行（不安装）
+cd example
+set PYTHONPATH=..\src       # Windows
+export PYTHONPATH=../src    # Linux/Mac
+python fullDemo.py
+```
+
+如果已 `pip install` 过旧版本，先卸载避免冲突：
+```bash
+pip uninstall PySARibbon
+```
+
+### 收集运行时错误（不崩溃）
+
+```bash
+python -c "
+import sys, traceback
+sys.path.insert(0, '../src')
+def hook(t,v,tb):
+    traceback.print_exception(t,v,tb)
+sys.excepthook = hook
+exec(open('fullDemo.py').read())
+"
+```
+
+所有异常会打印但程序不会退出，方便一次性收集所有问题。
+
+### GUI 功能测试清单
+
+| # | 操作 | 预期结果 |
+|---|------|----------|
+| 1 | 切换 6 种样式 | 高度变化，布局正确 |
+| 2 | 点击 File 按钮 | Backstage 面板全屏弹出 |
+| 3 | Backstage 按 Escape / ← 返回 | 面板关闭 |
+| 4 | 颜色按钮点击 Red/Blue/Green | 色条/图标颜色变化 |
+| 5 | View → Show Context Tab | 上下文标签出现 |
+| 6 | 取消 Show Context Tab | 上下文标签消失 |
+| 7 | Toggle Panel Title | Panel 标题显示/隐藏 |
+| 8 | 双击 tab | 进入最小化模式（ribbon 折叠） |
+| 9 | 再次双击 tab | 恢复正常模式 |
+| 10 | 最小化模式下单击 tab | 弹出 popup 面板 |
+| 11 | 窗口拖拽 | 标题栏区域可拖动 |
+| 12 | 窗口边缘缩放 | 边缘拖拽可调整大小 |
+| 13 | 最大化/最小化/关闭按钮 | 功能正常 |
+| 14 | 滚轮在 ribbon 上滚动 | Panel 超出时可滚动，不膨胀 |
+| 15 | Word Wrap 开关 | 按钮文字换行/不换行 |
+| 16 | Icon Right Text 开关 | 所有按钮变为水平布局 |
+
+### PyQt6 兼容性调试
+
+如果遇到 `AttributeError: type object 'xxx' has no attribute 'yyy'`，说明缺少枚举 shim。
+
+修复方式（在 `src/PySARibbon/compat.py` 的 PyQt6 shim 区域添加）：
+```python
+# 查找 PyQt6 中的正确枚举名
+python -c "from PyQt6.QtXxx import QXxx; print(QXxx.EnumClass.Value)"
+
+# 在 compat.py 中添加
+QXxx.Value = QXxx.EnumClass.Value
+```
+
+如果遇到 `TypeError: argument has unexpected type 'StateFlag'`，需要将 `opt.state & QStyle.State_Xxx` 包裹为 `bool(...)`。
+
+### 常见问题
+
+| 症状 | 原因 | 修复 |
+|------|------|------|
+| `ImportError: cannot import name 'SARibbonPanelItem'` | 系统安装了旧版本 | `pip uninstall PySARibbon` |
+| `RuntimeError: wrapped C/C++ object has been deleted` | deleteLater 后事件到达 | 已在 SARibbonToolButton.event 中 try/except |
+| 双击 tab 后 ribbon 自动扩展 | click 信号在 double-click 后触发 | 已用 `_skipNextClick` 修复 |
+| File 按钮点击无反应 | eventFilter 吞掉了子控件点击 | 已检查 childAt |
+| 滚轮导致 panel 无限变宽 | expand 计算基于膨胀后的 sizeHint | 已改用 minimumSizeHint |
+| `setEnabled` 收到 None | Python 短路求值返回 None 非 False | 包裹 `bool()` |
