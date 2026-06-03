@@ -1,82 +1,113 @@
-﻿# 简介
+# PySARibbon
 
- 本项目是基于[尘中远](https://gitee.com/czyt1988)的一个轻量级的Ribbon控件([SARibbon](https://gitee.com/czyt1988/SARibbon))移植的pyqt版本，功能与原版本基本保持一致
- 
- 界面截图也基本相似：
+基于 [sardkit/SARibbon-pyqt5](https://github.com/sardkit/SARibbon-pyqt5) 和 [czyt1988/SARibbon](https://github.com/czyt1988/SARibbon) (C++ Qt) 的 Python Ribbon UI 框架，同时支持 PyQt5 和 PyQt6。
 
 ![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/001.gif)
 
-MIT协议，欢迎大家使用并提出意见
+## 特性
 
-[gitee(码云) - https://gitee.com/sardkit/saribbon-pyqt5](https://gitee.com/sardkit/saribbon-pyqt5)
+- **6 种 Ribbon 样式**：Office/WPS × 三行/两行/单行
+- **PyQt5 + PyQt6 双支持**：通过 compat 兼容层自动适配
+- **完整组件**：SARibbonMainWindow, SARibbonWidget, SARibbonBar, Category, Panel, ToolButton, Gallery
+- **新增组件**：SARibbonColorToolButton, SARibbonSystemButtonBar, SARibbonApplicationWidget (Backstage)
+- **自定义系统**：SARibbonCustomizeWidget 支持运行时自定义 Ribbon 布局
+- **7 个主题**：dark, dark2, office2013, office2016-blue, office2021-blue, win7, matlab
+- **对齐 C++ v2.8.0**：SingleRow 模式、enableIconRightText、enableWordWrap 等 API
 
-[github(hub) - https://github.com/sardkit/SARibbon-pyqt5](https://github.com/sardkit/SARibbon-pyqt5)
+## 安装
 
- 它支持4种目前常见的ribbon样式在线切换（目前简单测试通过，未进行深度测试）
-
- 包括2种office模式，office模式是最常见的ribbon模式了，就是我们经常看到的word模式，office模式的tab和标题栏占用位置较多。
-
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/office-mode.png)
-
- 另两种参考wps设计的wps模式，wps模式是office模式的改良版，它为了减小ribbon的高度，把标签和标题栏设置在一起
- 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/wps-mode.png)
-
- office模式和wps模式都支持两行和3行设计，满足不同界面需求。
-
-# 使用方法
-
-1. 进入src目录，打开终端，安装此包，命令如下:
-
-```shell
-python setup.py install
+```bash
+pip install PySARibbon
 ```
 
-2然后在项目的文件中`import PySARibbon`或`from PySARibbon import *`即可，
-或者引用具体实用类示例如下：
-
-```Python
-from PySARibbon import SARibbonMainWindow
+或从源码安装：
+```bash
+git clone https://github.com/LyingCortex/SARibbon-pyqt5.git
+cd SARibbon-pyqt5
+pip install -e .
 ```
 
+依赖：`PyQt5>=5.12` 或 `PyQt6>=6.2`
 
-# 更多截图(copy自原Qt项目)
+## 快速开始
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-01.gif)
+```python
+from PySARibbon import SARibbonMainWindow, SARibbonBar
+from PySARibbon.compat import QApplication, QAction, QIcon
 
-- 支持quickAccessBar（word快速菜单），在wps模式和office模式下会有不同的显示效果
+app = QApplication([])
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-quickAccessBar.gif)
+window = SARibbonMainWindow(None, True)
+window.setWindowTitle("My App")
 
-- 支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
+ribbon = window.ribbonBar()
+ribbon.setTitle("File")
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-ribbonbutton.gif)
+# 添加标签页和面板
+category = ribbon.addCategoryPage("Main")
+panel = category.addPanel("File")
+panel.addLargeAction(QAction(QIcon(), "New", window))
+panel.addLargeAction(QAction(QIcon(), "Open", window))
+panel.addSmallAction(QAction(QIcon(), "Save", window))
 
-- 支持qss对ribbon进行设置
+# 切换样式
+ribbon.setRibbonStyle(SARibbonBar.WpsLiteStyleSingleRow)
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-useqss.gif)
+window.show()
+app.exec()
+```
 
+## 样式预览
 
-# 题外
+| 样式 | 高度 |
+|------|------|
+| OfficeStyle (三行) | 160px |
+| WpsLiteStyle (三行) | 130px |
+| OfficeStyleTwoRow | 134px |
+| WpsLiteStyleTwoRow | 104px |
+| OfficeStyleSingleRow | 100px |
+| WpsLiteStyleSingleRow | 80px |
 
-大部分代码是根据原C++代码结构进行移植的，也有部分是基于Python语法特性对原代码结构进行了调整和更改；
+## 运行示例
 
-更多相关功能可看Qt原作者相关项目，欢迎有兴趣的朋友一起完善本并丰富本项目。
+```bash
+cd example
+set PYTHONPATH=..\src       # Windows
+export PYTHONPATH=../src    # Linux/Mac
+python fullDemo.py
+```
 
-# 计划及进度
+## 测试
 
-## 计划
+```bash
+QT_QPA_PLATFORM=offscreen python -m pytest tests/ -v
+```
 
-- 实现C++版最新功能
+## 项目结构
 
-## 已知bug
+```
+src/PySARibbon/
+├── compat.py                  # PyQt5/PyQt6 兼容层
+├── SARibbonMainWindow.py      # 主窗口
+├── SARibbonWidget.py          # 可嵌入的 Ribbon 容器
+├── SARibbonBar.py             # Ribbon 工具栏
+├── SARibbonBarLayout.py       # Bar 布局管理器
+├── SARibbonCategory.py        # 标签页
+├── SARibbonCategoryLayout.py  # 标签页布局管理器
+├── SARibbonPanel.py           # 面板
+├── SARibbonPanelLayout.py     # 面板布局管理器
+├── SARibbonApplicationWidget.py  # Backstage 面板
+├── SARibbonSystemButtonBar.py    # 系统按钮栏
+├── SAWidgets/                 # 子控件（ToolButton, ColorToolButton, Gallery 等）
+├── SACustomize/               # 自定义化系统
+└── resource/                  # 主题 QSS 文件
+```
 
-- 暂未完全测试
+## 致谢
 
-## 已解决
+- [czyt1988/SARibbon](https://github.com/czyt1988/SARibbon) — 原始 C++ Qt Ribbon 控件
+- [sardkit/SARibbon-pyqt5](https://github.com/sardkit/SARibbon-pyqt5) — 最初的 PyQt5 移植版本
 
-- 略
+## 许可证
 
-# 其他
-
-> 此处向原作者[尘中远](https://gitee.com/czyt1988)致敬
+MIT License

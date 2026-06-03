@@ -30,8 +30,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sardkit/SARibbon-pyqt5"
-Repository = "https://github.com/sardkit/SARibbon-pyqt5"
+Homepage = "https://github.com/LyingCortex/SARibbon-pyqt5"
+Repository = "https://github.com/LyingCortex/SARibbon-pyqt5"
 
 [tool.setuptools.packages.find]
 where = ["src"]

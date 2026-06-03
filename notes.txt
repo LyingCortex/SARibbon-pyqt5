@@ -1,0 +1,14 @@
+ python -m build
+
+  # 上传（会提示输入凭证）
+  python -m twine upload dist/*
+  # Username: __token__
+  # Password: <你的新token>
+
+  或者配置 ~/.pypirc 文件（不要提交到 git）：
+
+  [pypi]
+  username = __token__
+  password = pypi-<你的新token>
+
+  然后直接 twine upload dist/* 即可。
